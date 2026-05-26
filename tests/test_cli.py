@@ -23,14 +23,17 @@ def test_help_exits_zero():
 @pytest.mark.parametrize(
     "argv",
     [
-        # init (EPIC C1) and extract-overrides (EPIC D) are implemented;
-        # generate and validate remain stubs — nonzero exit expected.
-        ["generate", "--engagement", "/tmp/x"],
+        # validate remains a stub — nonzero exit expected.
         ["validate", "--engagement", "/tmp/x"],
     ],
 )
 def test_stub_commands_exit_nonzero(argv):
     assert main(argv) != 0
+
+
+def test_generate_nonexistent_engagement_exits_nonzero():
+    # generate is implemented (EPIC E); nonexistent engagement dir → nonzero.
+    assert main(["generate", "--engagement", "/tmp/__schema_forge_no_such_dir__"]) != 0
 
 
 def test_extract_overrides_nonexistent_dir_exits_nonzero():

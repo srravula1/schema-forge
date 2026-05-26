@@ -172,8 +172,48 @@ def cmd_extract_overrides(
     return 0
 
 
-def cmd_generate(args: argparse.Namespace) -> int:
-    return _stub("generate", "EPIC E")
+def cmd_generate(
+    args: argparse.Namespace,
+    *,
+    _now=None,
+) -> int:
+    """Deterministic merge: 02_baseline/ + 03_overrides/ -> 04_output/ + manifest.yaml (EPIC E)."""
+    from forge.merge import run_generate
+
+    engagement = args.engagement.resolve()
+
+    if not engagement.is_dir():
+        print(
+            f"generate: engagement directory not found: {engagement}",
+            file=sys.stderr,
+        )
+        return 1
+
+    manifest_path = engagement / "manifest.yaml"
+    if not manifest_path.exists():
+        print(
+            f"generate: manifest.yaml not found in {engagement}. Run 'schema-forge init' first.",
+            file=sys.stderr,
+        )
+        return 1
+
+    import yaml as _yaml
+    manifest_data = _yaml.safe_load(manifest_path.read_text()) or {}
+    client = manifest_data.get("client")
+    if not client:
+        print(
+            f"generate: manifest.yaml is missing 'client' field in {engagement}.",
+            file=sys.stderr,
+        )
+        return 1
+
+    try:
+        run_generate(engagement, client, now=_now)
+        print(f"Generated output in: {engagement / '04_output'}", file=sys.stderr)
+        return 0
+    except Exception as exc:
+        print(f"generate: {exc}", file=sys.stderr)
+        return 1
 
 
 def cmd_validate(args: argparse.Namespace) -> int:
