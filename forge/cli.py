@@ -18,6 +18,8 @@ import argparse
 import sys
 from pathlib import Path
 
+from forge.scaffold import init_engagement
+
 _NOT_IMPLEMENTED = 2
 
 
@@ -30,7 +32,16 @@ def _stub(command: str, epic: str) -> int:
 
 
 def cmd_init(args: argparse.Namespace) -> int:
-    return _stub("init", "EPIC C")
+    try:
+        init_engagement(args.domain, args.client, args.output)
+        print(f"Engagement initialized: {args.output}", file=sys.stderr)
+        return 0
+    except ValueError as exc:
+        print(f"schema-forge init: {exc}", file=sys.stderr)
+        return 1
+    except FileExistsError as exc:
+        print(f"schema-forge init: {exc}", file=sys.stderr)
+        return 1
 
 
 def cmd_extract_overrides(args: argparse.Namespace) -> int:
