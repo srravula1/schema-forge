@@ -1,0 +1,175 @@
+# channel_overrides.yaml — REVIEWED (post-extract-overrides human review, 2026-05-25)
+# Source interviews: 03_channel_interview.md §§1-5 (signal patterns, warm-prospect definition),
+#                   01_company_overview.md §5 (channel mix),
+#                   02_icp_interview.md §3 (deal patterns, L1/L2/L3 losses)
+# Reviewed and edited by FDE: signal weights calibrated against P1/P2/P3 won-deal analysis
+#                             and L1/L2/L3 lost-deal post-mortems.
+#
+# Signal weights: 0.0 = ignore, 0.5 = moderate signal, 1.0 = strong signal
+# Custom signals: added to schema as derived labels (add_to_schema: true)
+#
+# Note on signal_weights keys: keys MUST be existing baseline GtmLabel values
+# (e.g., "signal.pain_point_mention"). Custom signals defined in this file
+# are referenced in policy conditions by their name (e.g., S_SAP_FIELD_CO_SELL)
+# but are NOT put in signal_weights — they are scored via policy conditions instead.
+
+signal_weights:
+  # Hiring trigger: moderate signal in SAP context. Hiring for SAP S/4HANA
+  # Functional Consultant, SAP BTP Developer, or SAP Joule-specific roles indicates
+  # active SAP program investment. Generic IT hiring is low signal.
+  # Source: 02_icp_interview.md §1 (tech-stack signals from job postings).
+  signal.hiring_trigger: 0.45
+
+  # Tech adoption: highest-weight baseline signal. When an account has adopted
+  # SAP S/4HANA, RISE with SAP, or SAP BTP AI Core, they are in the window where
+  # Joule implementation is both technically feasible and likely budgeted.
+  # S/4HANA adoption is the prerequisite for Joule access.
+  # Source: 02_icp_interview.md §1, P1/P2 deal analysis.
+  signal.tech_adoption: 0.90
+
+  # Funding trigger: low signal in SAP enterprise context. SAP customers are
+  # predominantly large enterprises; VC funding is not a reliable buying signal.
+  # Budget comes from operating budgets and capital programs, not funding rounds.
+  # Source: 02_icp_interview.md §2 (deal economics — revenue >= $100M proxy).
+  signal.funding_trigger: 0.15
+
+  # Pain point mention: high signal when SAP-specific. An articulated problem
+  # in SAP processes (month-end close, goods receipt matching, order management)
+  # is a strong buying signal. Generic "we need AI" is moderate signal only.
+  # Source: 04_qualification_interview.md §2 (Q_NEED_ARTICULATED evidence gate).
+  signal.pain_point_mention: 0.82
+
+  # Intent topic: high signal when topics are in the add list (Joule, S/4 migration,
+  # clean core, BTP, AI-in-ERP). Low signal when generic (AI trends, cloud).
+  # Source: modifier_overrides.yaml intent_topics.add + 03_channel_interview.md §5.
+  signal.intent_topic: 0.75
+
+custom_signals:
+  - name: S_S4_MIGRATION_TIMELINE
+    definition: >
+      Explicit evidence that the account has a confirmed, funded S/4HANA migration
+      program with a named start date or completion target within the next 24 months.
+      Qualifying evidence includes: an announced S/4 go-live target, a project team
+      posting for S/4HANA roles, a press release or executive statement committing to
+      S/4 migration, or a Big4 / SI partner reference to a live S/4 program at the
+      account. Does NOT qualify: vague statements like "we plan to migrate eventually"
+      or "we're evaluating S/4HANA" without a named timeline. The ECC-to-S/4 migration
+      is the single most important precondition for a Joule pilot on an ECC account.
+    rationale: >
+      ICP interview §1 and qualification interview §1: the S/4HANA migration timeline
+      is the primary qualification gate for ECC accounts. L1 (energy company, DQ'd)
+      was disqualified because they had no funded S/4 roadmap despite a large SAP user
+      base. P1 (chemicals, $285k) closed because the client had an active S/4 migration
+      with a hard ECC sunset deadline 18 months out. This signal separates "SAP user"
+      (low signal) from "SAP buyer within the Joule window" (high signal).
+    add_to_schema: true
+
+  - name: S_JOULE_INTEREST
+    definition: >
+      Direct, prospect-initiated evidence that the account is evaluating or planning
+      to implement SAP Joule — the SAP AI copilot embedded in S/4HANA and BTP.
+      Qualifying evidence: the prospect names Joule specifically in a call, email,
+      or document; a job posting explicitly lists SAP Joule as a required skill; the
+      CIO or IT VP asks "how do we activate Joule?" during discovery. Does NOT
+      qualify: SAP AE assertion that the account "should be interested in Joule" without
+      end-customer confirmation; generic "AI" interest without naming Joule; intent-data
+      topic hits from SAP marketing campaigns about Joule (SAP's own content, not the
+      prospect's search behavior).
+    rationale: >
+      Qualification interview §1: the use-case gate requires a named Joule or BTP AI
+      use case articulated by the end-customer. Company overview §6 notes the failure
+      mode of confusing SAP marketing reach (SAP's own Joule whitepaper downloads)
+      with genuine prospect intent. This signal specifically requires prospect-originated
+      Joule interest, not SAP-originated marketing attribution. 05_failure_modes_interview.md
+      FM-SAP-04 documents the SAP-marketing-copy false positive.
+    add_to_schema: true
+
+  - name: S_CLEAN_CORE_INITIATIVE
+    definition: >
+      Evidence that the account is implementing SAP's clean core strategy — removing
+      custom code and side-by-side extensions in preparation for S/4HANA cloud migration.
+      Qualifying evidence: job postings for "clean core architect" or "SAP clean core
+      consultant," explicit statements about a clean core program, references to SAP
+      Clean Core certification or SAP's clean core assessment tools. Clean core is a
+      necessary but NOT sufficient signal for Joule readiness — it indicates the account
+      is on the S/4 migration path but may still be 12-24 months from Joule readiness.
+      Use as a medium-priority nurture signal; combine with S_S4_MIGRATION_TIMELINE for
+      higher confidence.
+    rationale: >
+      05_failure_modes_interview.md FM-SAP-07 and FM-SAP-09: clean core is an ambiguous
+      signal. It can be a false positive (just removing customizations with no AI plans)
+      or a true positive (first step in a RISE migration that will include Joule). The
+      signal is valuable for nurture scoring but must be combined with a migration
+      timeline to move an account to active pipeline. 03_channel_interview.md §5 notes
+      that prospects beginning clean core work who mention a RISE target date are
+      warm-prospect candidates within 12 months.
+    add_to_schema: true
+
+  - name: S_RISE_ADOPTION
+    definition: >
+      Evidence that the account has adopted or contracted for RISE with SAP — SAP's
+      cloud ERP subscription bundle that includes S/4HANA Cloud and BTP entitlements.
+      Qualifying evidence: the account is publicly listed as a RISE with SAP customer,
+      a job posting requires RISE with SAP experience, an executive announcement
+      references RISE, or a partner (SI or SAP AE) confirms a RISE contract is in place.
+      RISE adoption is a strong signal because (1) it means S/4HANA is either live or
+      being deployed, (2) BTP entitlements are included, and (3) Joule is available
+      as part of the RISE license — meaning there is no additional infrastructure cost
+      barrier to a Joule pilot.
+    rationale: >
+      ICP interview §1 (tech-stack signals): RISE with SAP is rated "very high signal"
+      because it bundles BTP entitlements. P2 (retail chain, $410k) was a RISE customer
+      and the BTP infrastructure was already in place, reducing implementation risk and
+      cost. Company overview §6 §3 (P3 pilot on GROW with SAP): even the SME-tier GROW
+      program includes BTP Starter, making Joule accessible. Both RISE and GROW are
+      high-priority signals. Source: https://www.sap.com/products/rise.html (RISE
+      includes BTP credits and Joule entitlement in standard license).
+    add_to_schema: true
+
+  - name: S_SAP_FIELD_CO_SELL
+    definition: >
+      Active co-sell engagement from an SAP SE employee — specifically an SAP Account
+      Executive, Area Sales Manager, Regional VP, or VP of Sales — who has introduced
+      or referred this firm into an end-customer account via the SAP co-sell program
+      or direct referral. Qualifying evidence: an SAP AE has sent an introduction email,
+      set up a three-way meeting, or listed the firm as a co-sell partner in the SAP
+      co-sell portal for a specific account. Does NOT qualify: informal LinkedIn
+      connection with an SAP employee who has not made a specific referral; past SAP
+      event attendance; general partner relationship with SAP SE without a named
+      account-specific co-sell nomination. CRITICAL: this signal indicates channel
+      engagement, NOT end-customer qualification. An account with S_SAP_FIELD_CO_SELL
+      is not qualified until S_JOULE_INTEREST or Q_BUDGET_CONFIRMED is also present
+      from the end-customer directly.
+    rationale: >
+      Company overview §5 channel mix: SAP-field co-sell is the #1 deal-volume source
+      (~55% of pipeline) but has a low conversion rate (~22% to signed deal).
+      03_channel_interview.md §2: the SAP AE failure mode (channel mirage) is the most
+      costly qualification error. L3 (SAP AE-referred retail company, 45 days wasted)
+      confirmed that AE enthusiasm ≠ end-customer budget. This signal is a routing
+      signal (route to Alliances Owner per 04_qualification_interview.md §3) and a
+      channel-noise guard when present without end-customer qualification evidence.
+    add_to_schema: true
+
+  - name: S_SI_PARTNER_INVOLVED
+    definition: >
+      Evidence that a Systems Integrator (Big4 consulting firm or large IT consulting
+      partner) is running or bidding on an SAP transformation program at the account,
+      and has engaged or is evaluating this firm as a Joule/AI specialist subcontractor.
+      Qualifying evidence: a Big4 MD or Partner has reached out about subcontracting;
+      the firm is named in a Big4 proposal or SOW as a Joule specialist; a signed prime
+      contract exists with a named SOW slot for Joule work. Does NOT qualify: a Big4
+      relationship at the account level without a live program; an SI firm that lost
+      the prime contract; an SI exploring subcontractors for a proposal they have not
+      yet won. CRITICAL: this signal indicates partner pipeline, not direct end-customer
+      qualification. The end-customer budget is confirmed by the prime contract, not by
+      direct end-customer conversation in SI-partner cases.
+    rationale: >
+      Company overview §5 channel mix: Big4/SI pull-through is the #2 deal-volume
+      source (~30% of pipeline) and the highest-quality leads when the prime contract
+      is signed. 03_channel_interview.md §3: the Big4 MD relationship failure mode
+      (4 months invested, prime contract lost) is a major time sink. 05_failure_modes_interview.md
+      FM-SAP-03 documents this failure mode. The signal is only high-quality when a
+      signed prime contract or final-stage LOI is confirmed. Route to SI-Partner Lead
+      per 04_qualification_interview.md §3 for prime contract confirmation before
+      activating in pipeline.
+    add_to_schema: true

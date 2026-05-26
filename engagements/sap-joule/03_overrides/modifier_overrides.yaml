@@ -1,0 +1,90 @@
+# modifier_overrides.yaml — REVIEWED (post-extract-overrides human review, 2026-05-25)
+# Source interviews: 01_company_overview.md §1 (service types, SAP landscape),
+#                   02_icp_interview.md §1 (tech-stack signals, SAP modules),
+#                   03_channel_interview.md §5 (warm-prospect definition, intent topics)
+# Reviewed and edited by FDE: topics verified against SAP Joule product documentation
+#                             and SAP BTP AI Core capability descriptions.
+#
+# These overrides add/restrict entries in the modifier ontology (modifiers.yaml).
+# The intent_topics.add list is used during intent signal extraction to recognize
+# topics that are directly relevant to SAP Joule / AI-in-ERP implementation.
+#
+# SAP landscape dimensions are captured via A_TECH_STACK_ITEM in the base schema;
+# this modifier layer provides extraction-prompt vocabulary for each dimension.
+#
+# ERP core values (normalized_value on A_TECH_STACK_ITEM):
+#   sap_ecc_6               — SAP ECC 6.0 (on-premises, pre-S/4)
+#   sap_s4hana_onprem       — SAP S/4HANA on-premises
+#   sap_s4hana_cloud_private — SAP S/4HANA Cloud private edition
+#   sap_s4hana_cloud_public  — SAP S/4HANA Cloud public edition
+#   sap_rise                — RISE with SAP (cloud subscription, includes BTP)
+#   sap_grow                — GROW with SAP (SME cloud, includes BTP Starter)
+#
+# Deployment model values (in modifier guidance, not a separate base label):
+#   on_premises, cloud_hosted, hybrid, rise_subscription, grow_subscription
+#
+# Module footprint values (each module as a separate A_TECH_STACK_ITEM entity):
+#   SAP FI (Financial Accounting), SAP CO (Controlling),
+#   SAP MM (Materials Management), SAP SD (Sales & Distribution),
+#   SAP PP (Production Planning), SAP QM (Quality Management),
+#   SAP HCM (Human Capital Management), SAP EWM (Extended Warehouse Mgmt),
+#   SAP PM (Plant Maintenance), SAP PS (Project System)
+#
+# SAP user-base buckets (modifier guidance; no base label maps to this):
+#   sap_users_lt500, sap_users_500_2000, sap_users_2000_10000, sap_users_gt10000
+#
+# SAP IS-industries (modifier guidance):
+#   retail, manufacturing, chemicals, energy_utilities,
+#   life_sciences, financial_services, public_sector
+#
+# Source citations for modifier dimensions:
+#   SAP product pages: https://www.sap.com/products/erp.html (ECC/S4 variants)
+#   RISE with SAP: https://www.sap.com/products/rise.html
+#   GROW with SAP: https://www.sap.com/products/grow.html
+#   SAP BTP AI Core: https://www.sap.com/products/technology-platform/ai-services.html
+#   SAP Joule: https://www.sap.com/products/artificial-intelligence/ai-assistant.html
+
+intent_topics:
+  add:
+    - "SAP Joule"
+    - "SAP Joule implementation"
+    - "S/4HANA migration"
+    - "ECC to S/4HANA migration"
+    - "clean core SAP"
+    - "SAP BTP AI Core"
+    - "SAP Business Technology Platform"
+    - "RISE with SAP"
+    - "GROW with SAP"
+    - "AI in ERP"
+    - "AI in SAP"
+    - "SAP AI implementation"
+    - "SAP generative AI"
+    - "SAP intelligent automation"
+    - "BTP GenAI Hub"
+    - "SAP embedded analytics AI"
+    - "FI period-close automation"
+    - "MM invoice matching AI"
+    - "SD order exception management"
+    - "SAP ECC sunset 2027"
+    - "SAP maintenance end date"
+    - "SAP modernization"
+  deprioritize:
+    - "SAP reselling"
+    - "SAP licensing negotiation"
+    - "SAP price optimization"
+    - "SAP training courses"
+    - "SAP certification"
+    - "generic ERP selection"
+    - "non-SAP ERP evaluation"
+  rationale: >
+    Client delivers Joule and BTP AI Core implementation on SAP ECC/S/4HANA landscapes
+    (01_company_overview.md §1). The add list contains topics a prospect evaluating or
+    planning Joule/AI-in-ERP work would produce as intent signals — these map directly
+    to the firm's service lines: Readiness Assessment, Joule Pilot Sprint, S/4HANA
+    Migration + AI Uplift. S/4HANA migration and ECC sunset topics are included because
+    the migration timeline is the primary qualification gate (02_icp_interview.md §1).
+    Clean core is included as a pre-migration signal that can indicate Joule readiness
+    within 12-18 months. Deprioritize list contains high-volume SAP-adjacent signals
+    that do not indicate implementation buying intent (licensing, training, generic ERP
+    selection, non-SAP ERP evaluation). Source: SAP product documentation and
+    03_channel_interview.md §5 warm-prospect definition.

@@ -1,0 +1,122 @@
+# icp_overrides.yaml — REVIEWED (post-extract-overrides human review, 2026-05-25)
+# Source interviews: 02_icp_interview.md §§1-5 (deal patterns, ICP, anti-ICP),
+#                   01_company_overview.md §§2-3 (deal economics, who signs),
+#                   04_qualification_interview.md §§1-2 (evidence gates)
+# Reviewed and edited by FDE: all rationale fields verified against P1/P2/P3 won-deal
+#                             analysis and L1/L2/L3 lost-deal post-mortems.
+#
+# These overrides narrow the valid value space for account-family labels.
+# Merge semantics: produce additional sentences in extraction_guidance()
+# and drive disqualification logic in the policy module.
+#
+# Contact org-affiliation convention (see DESIGN.md §D3):
+# - End-customer contacts: C_TITLE normalized_value uses standard seniority buckets.
+#   Department: engineering (SAP CoE, IT), finance (FI use cases), operations (supply chain).
+# - SAP-field contacts: C_TITLE normalized_value appends "|sap_field" tag (e.g., "vp|sap_field").
+#   These contacts are not buyers; they are co-sell channel contacts.
+#   Seniority: regional_vp, vp_sales, account_executive -> map to vp or ic/manager.
+#   Department: sales.
+# - SI-partner contacts: C_TITLE normalized_value appends "|si_partner" tag.
+#   Seniority: managing_director -> c_suite; partner -> vp.
+#   Department: other (consulting practice).
+#
+# The contact org-affiliation is captured by convention (normalized_value tag) because
+# gtm@v1 has no C_ORG_AFFILIATION label. This is a gtm@v2 candidate (DESIGN.md §D3).
+
+A_EMPLOYEE_RANGE:
+  include:
+    - "1001-5000"
+    - "5000+"
+  preferred:
+    - "5000+"
+  rationale: >
+    SAP ERP implementations are predominantly large-enterprise. P1 (chemicals, $285k)
+    had ~2,400 SAP users at an ~8,000-employee company; P2 (retail, $410k) had ~900
+    SAP users. Companies below 1,000 employees rarely have a SAP S/4HANA footprint
+    that justifies a $150k+ Joule pilot (they are more likely on SAP Business One or
+    a non-SAP ERP). The floor is 500 employees (02_icp_interview.md §1 minimum floor)
+    mapped to the '1001-5000' bucket as the practical ICP inclusion. Companies above
+    5,000 employees have the largest SAP footprints and the highest pilot value.
+    Exclude smaller buckets as a general filter; do not DQ solely on this — use
+    Q_BUDGET_CONFIRMED as the true floor test.
+
+A_REVENUE_RANGE:
+  include:
+    - "250M-1B"
+    - "1B+"
+  preferred:
+    - "1B+"
+  rationale: >
+    Pilot budget floor is $150k (01_company_overview.md §2). Revenue of $250M+ is
+    the practical proxy for a company that can absorb a $150k-$500k consulting engagement
+    in a single fiscal year without it being a board-level budget exception. P1
+    ($285k deal) was at ~$1.5B revenue; P2 ($410k deal) was at ~$3B revenue; P3
+    ($175k deal) was at ~$400M revenue (just above the floor). Companies below $100M
+    revenue consistently fail the budget gate regardless of their SAP interest level
+    (02_icp_interview.md §1 minimum floor). The '250M-1B' bucket is the entry point;
+    '1B+' is the preferred ICP.
+
+A_INDUSTRY:
+  preferred:
+    - "Manufacturing"
+    - "Chemicals"
+    - "Retail"
+    - "Life Sciences"
+    - "Energy & Utilities"
+    - "Consumer Products"
+  rationale: >
+    Won deal concentration in SAP IS-industry verticals with the largest SAP footprints
+    and the most complex FI/CO, MM/SD/PP, and QM workflows (02_icp_interview.md §1).
+    P1 was chemicals, P2 was retail, P3 was life sciences. Manufacturing and chemicals
+    have the highest density of SAP-intensive processes (batch production, cost accounting,
+    quality management) where Joule use cases have measurable ROI. Energy & Utilities
+    is early pipeline but fits the profile (large SAP footprints, complex asset accounting).
+    Financial services and public sector use SAP FI/CO extensively but their Joule use
+    cases are different (regulatory reporting, not operational automation); flag as
+    secondary preferred. Technology and SaaS companies rarely run SAP ERP for their
+    core operations — exclude as primary ICP.
+
+A_FUNDING_STAGE:
+  preferred:
+    - "public"
+    - "acquired"
+  rationale: >
+    SAP enterprise customers are predominantly public companies or large private/PE-backed
+    firms. The 'public' and 'acquired' funding stages correlate with the revenue scale
+    ($500M+) and procurement maturity needed for a $150k+ milestone-based engagement.
+    VC-backed startups and early-stage companies almost never run SAP S/4HANA — they
+    use Workday, NetSuite, or SAP Business One at most. Do not use funding stage as a
+    hard filter (many large PE-backed companies are 'private' with no public stage label);
+    use it as a signal that the account is likely in the right revenue range when 'public'
+    or 'acquired' is confirmed.
+
+C_SENIORITY:
+  preferred:
+    - "c_suite"
+    - "vp"
+    - "director"
+  rationale: >
+    End-customer deal closers are c_suite (CIO, CFO) and vp-level (VP IT, VP EA)
+    (01_company_overview.md §3). Director-level (SAP Program Director, Head of SAP CoE)
+    is the primary champion — the "yes" from a Director-level contact is a strong buying
+    signal but not a signer signal. IC-level contacts (BASIS admin, ABAP developer) are
+    technical validators only.
+    SAP-field co-sell contacts: seniority is vp (Regional VP, VP Sales) or manager
+    (Account Executive). These map to normalized_value|sap_field convention.
+    SI-partner contacts: seniority is c_suite (Managing Director) or vp (Partner).
+    These map to normalized_value|si_partner convention.
+    Note: 'c_suite' and 'vp' contacts from sap_field or si_partner orgs are NOT
+    end-customer buyers — check C_TITLE normalized_value for org-affiliation tag before
+    treating as a buying signal.
+
+C_DEPARTMENT:
+  preferred:
+    - "engineering"
+    - "finance"
+    - "operations"
+  rationale: >
+    IT/Engineering (SAP Platform, Enterprise Architecture, SAP CoE) and Finance
+    (FI/CO use cases) generate the most deals (01_company_overview.md §3).
+    Supply Chain/Operations when use case is MM/SD/PP. Sales department indicates
+    a SAP-field co-sell contact, not an end-customer buyer — presence of a 'sales'
+    department contact should trigger co-sell routing logic, not direct AE routing.

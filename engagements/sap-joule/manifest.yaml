@@ -1,0 +1,294 @@
+baseline_version: gtm_v1.0
+client: sap-joule
+generated_at: '2026-05-26T03:35:28Z'
+output:
+  changes_from_baseline:
+  - "A_EMPLOYEE_RANGE: include ['1001-5000', '5000+']; preferred ['5000+'] — SAP ERP\
+    \ implementations are predominantly large-enterprise. P1 (chemicals, $285k) had\
+    \ ~2,400 SAP users at an ~8,000-employee company; P2 (retail, $410k) had ~900\
+    \ SAP users. Companies below 1,000 employees rarely have a SAP S/4HANA footprint\
+    \ that justifies a $150k+ Joule pilot (they are more likely on SAP Business One\
+    \ or a non-SAP ERP). The floor is 500 employees (02_icp_interview.md §1 minimum\
+    \ floor) mapped to the '1001-5000' bucket as the practical ICP inclusion. Companies\
+    \ above 5,000 employees have the largest SAP footprints and the highest pilot\
+    \ value. Exclude smaller buckets as a general filter; do not DQ solely on this\
+    \ — use Q_BUDGET_CONFIRMED as the true floor test.\n (icp_overrides.yaml)"
+  - "A_FUNDING_STAGE: preferred ['public', 'acquired'] — SAP enterprise customers\
+    \ are predominantly public companies or large private/PE-backed firms. The 'public'\
+    \ and 'acquired' funding stages correlate with the revenue scale ($500M+) and\
+    \ procurement maturity needed for a $150k+ milestone-based engagement. VC-backed\
+    \ startups and early-stage companies almost never run SAP S/4HANA — they use Workday,\
+    \ NetSuite, or SAP Business One at most. Do not use funding stage as a hard filter\
+    \ (many large PE-backed companies are 'private' with no public stage label); use\
+    \ it as a signal that the account is likely in the right revenue range when 'public'\
+    \ or 'acquired' is confirmed.\n (icp_overrides.yaml)"
+  - "A_INDUSTRY: preferred ['Manufacturing', 'Chemicals', 'Retail', 'Life Sciences',\
+    \ 'Energy & Utilities', 'Consumer Products'] — Won deal concentration in SAP IS-industry\
+    \ verticals with the largest SAP footprints and the most complex FI/CO, MM/SD/PP,\
+    \ and QM workflows (02_icp_interview.md §1). P1 was chemicals, P2 was retail,\
+    \ P3 was life sciences. Manufacturing and chemicals have the highest density of\
+    \ SAP-intensive processes (batch production, cost accounting, quality management)\
+    \ where Joule use cases have measurable ROI. Energy & Utilities is early pipeline\
+    \ but fits the profile (large SAP footprints, complex asset accounting). Financial\
+    \ services and public sector use SAP FI/CO extensively but their Joule use cases\
+    \ are different (regulatory reporting, not operational automation); flag as secondary\
+    \ preferred. Technology and SaaS companies rarely run SAP ERP for their core operations\
+    \ — exclude as primary ICP.\n (icp_overrides.yaml)"
+  - "A_REVENUE_RANGE: include ['250M-1B', '1B+']; preferred ['1B+'] — Pilot budget\
+    \ floor is $150k (01_company_overview.md §2). Revenue of $250M+ is the practical\
+    \ proxy for a company that can absorb a $150k-$500k consulting engagement in a\
+    \ single fiscal year without it being a board-level budget exception. P1 ($285k\
+    \ deal) was at ~$1.5B revenue; P2 ($410k deal) was at ~$3B revenue; P3 ($175k\
+    \ deal) was at ~$400M revenue (just above the floor). Companies below $100M revenue\
+    \ consistently fail the budget gate regardless of their SAP interest level (02_icp_interview.md\
+    \ §1 minimum floor). The '250M-1B' bucket is the entry point; '1B+' is the preferred\
+    \ ICP.\n (icp_overrides.yaml)"
+  - "C_DEPARTMENT: preferred ['engineering', 'finance', 'operations'] — IT/Engineering\
+    \ (SAP Platform, Enterprise Architecture, SAP CoE) and Finance (FI/CO use cases)\
+    \ generate the most deals (01_company_overview.md §3). Supply Chain/Operations\
+    \ when use case is MM/SD/PP. Sales department indicates a SAP-field co-sell contact,\
+    \ not an end-customer buyer — presence of a 'sales' department contact should\
+    \ trigger co-sell routing logic, not direct AE routing.\n (icp_overrides.yaml)"
+  - "C_SENIORITY: preferred ['c_suite', 'vp', 'director'] — End-customer deal closers\
+    \ are c_suite (CIO, CFO) and vp-level (VP IT, VP EA) (01_company_overview.md §3).\
+    \ Director-level (SAP Program Director, Head of SAP CoE) is the primary champion\
+    \ — the \"yes\" from a Director-level contact is a strong buying signal but not\
+    \ a signer signal. IC-level contacts (BASIS admin, ABAP developer) are technical\
+    \ validators only. SAP-field co-sell contacts: seniority is vp (Regional VP, VP\
+    \ Sales) or manager (Account Executive). These map to normalized_value|sap_field\
+    \ convention. SI-partner contacts: seniority is c_suite (Managing Director) or\
+    \ vp (Partner). These map to normalized_value|si_partner convention. Note: 'c_suite'\
+    \ and 'vp' contacts from sap_field or si_partner orgs are NOT end-customer buyers\
+    \ — check C_TITLE normalized_value for org-affiliation tag before treating as\
+    \ a buying signal.\n (icp_overrides.yaml)"
+  - signal_weight signal.funding_trigger=0.15 (channel_overrides.yaml)
+  - signal_weight signal.hiring_trigger=0.45 (channel_overrides.yaml)
+  - signal_weight signal.intent_topic=0.75 (channel_overrides.yaml)
+  - signal_weight signal.pain_point_mention=0.82 (channel_overrides.yaml)
+  - signal_weight signal.tech_adoption=0.9 (channel_overrides.yaml)
+  - "added custom signal S_CLEAN_CORE_INITIATIVE: Evidence that the account is implementing\
+    \ SAP's clean core strategy — removing custom code and side-by-side extensions\
+    \ in preparation for S/4HANA cloud migration. Qualifying evidence: job postings\
+    \ for \"clean core architect\" or \"SAP clean core consultant,\" explicit statements\
+    \ about a clean core program, references to SAP Clean Core certification or SAP's\
+    \ clean core assessment tools. Clean core is a necessary but NOT sufficient signal\
+    \ for Joule readiness — it indicates the account is on the S/4 migration path\
+    \ but may still be 12-24 months from Joule readiness. Use as a medium-priority\
+    \ nurture signal; combine with S_S4_MIGRATION_TIMELINE for higher confidence.\n\
+    \ — 05_failure_modes_interview.md FM-SAP-07 and FM-SAP-09: clean core is an ambiguous\
+    \ signal. It can be a false positive (just removing customizations with no AI\
+    \ plans) or a true positive (first step in a RISE migration that will include\
+    \ Joule). The signal is valuable for nurture scoring but must be combined with\
+    \ a migration timeline to move an account to active pipeline. 03_channel_interview.md\
+    \ §5 notes that prospects beginning clean core work who mention a RISE target\
+    \ date are warm-prospect candidates within 12 months.\n (channel_overrides.yaml)"
+  - "added custom signal S_JOULE_INTEREST: Direct, prospect-initiated evidence that\
+    \ the account is evaluating or planning to implement SAP Joule — the SAP AI copilot\
+    \ embedded in S/4HANA and BTP. Qualifying evidence: the prospect names Joule specifically\
+    \ in a call, email, or document; a job posting explicitly lists SAP Joule as a\
+    \ required skill; the CIO or IT VP asks \"how do we activate Joule?\" during discovery.\
+    \ Does NOT qualify: SAP AE assertion that the account \"should be interested in\
+    \ Joule\" without end-customer confirmation; generic \"AI\" interest without naming\
+    \ Joule; intent-data topic hits from SAP marketing campaigns about Joule (SAP's\
+    \ own content, not the prospect's search behavior).\n — Qualification interview\
+    \ §1: the use-case gate requires a named Joule or BTP AI use case articulated\
+    \ by the end-customer. Company overview §6 notes the failure mode of confusing\
+    \ SAP marketing reach (SAP's own Joule whitepaper downloads) with genuine prospect\
+    \ intent. This signal specifically requires prospect-originated Joule interest,\
+    \ not SAP-originated marketing attribution. 05_failure_modes_interview.md FM-SAP-04\
+    \ documents the SAP-marketing-copy false positive.\n (channel_overrides.yaml)"
+  - "added custom signal S_RISE_ADOPTION: Evidence that the account has adopted or\
+    \ contracted for RISE with SAP — SAP's cloud ERP subscription bundle that includes\
+    \ S/4HANA Cloud and BTP entitlements. Qualifying evidence: the account is publicly\
+    \ listed as a RISE with SAP customer, a job posting requires RISE with SAP experience,\
+    \ an executive announcement references RISE, or a partner (SI or SAP AE) confirms\
+    \ a RISE contract is in place. RISE adoption is a strong signal because (1) it\
+    \ means S/4HANA is either live or being deployed, (2) BTP entitlements are included,\
+    \ and (3) Joule is available as part of the RISE license — meaning there is no\
+    \ additional infrastructure cost barrier to a Joule pilot.\n — ICP interview §1\
+    \ (tech-stack signals): RISE with SAP is rated \"very high signal\" because it\
+    \ bundles BTP entitlements. P2 (retail chain, $410k) was a RISE customer and the\
+    \ BTP infrastructure was already in place, reducing implementation risk and cost.\
+    \ Company overview §6 §3 (P3 pilot on GROW with SAP): even the SME-tier GROW program\
+    \ includes BTP Starter, making Joule accessible. Both RISE and GROW are high-priority\
+    \ signals. Source: https://www.sap.com/products/rise.html (RISE includes BTP credits\
+    \ and Joule entitlement in standard license).\n (channel_overrides.yaml)"
+  - "added custom signal S_S4_MIGRATION_TIMELINE: Explicit evidence that the account\
+    \ has a confirmed, funded S/4HANA migration program with a named start date or\
+    \ completion target within the next 24 months. Qualifying evidence includes: an\
+    \ announced S/4 go-live target, a project team posting for S/4HANA roles, a press\
+    \ release or executive statement committing to S/4 migration, or a Big4 / SI partner\
+    \ reference to a live S/4 program at the account. Does NOT qualify: vague statements\
+    \ like \"we plan to migrate eventually\" or \"we're evaluating S/4HANA\" without\
+    \ a named timeline. The ECC-to-S/4 migration is the single most important precondition\
+    \ for a Joule pilot on an ECC account.\n — ICP interview §1 and qualification\
+    \ interview §1: the S/4HANA migration timeline is the primary qualification gate\
+    \ for ECC accounts. L1 (energy company, DQ'd) was disqualified because they had\
+    \ no funded S/4 roadmap despite a large SAP user base. P1 (chemicals, $285k) closed\
+    \ because the client had an active S/4 migration with a hard ECC sunset deadline\
+    \ 18 months out. This signal separates \"SAP user\" (low signal) from \"SAP buyer\
+    \ within the Joule window\" (high signal).\n (channel_overrides.yaml)"
+  - "added custom signal S_SAP_FIELD_CO_SELL: Active co-sell engagement from an SAP\
+    \ SE employee — specifically an SAP Account Executive, Area Sales Manager, Regional\
+    \ VP, or VP of Sales — who has introduced or referred this firm into an end-customer\
+    \ account via the SAP co-sell program or direct referral. Qualifying evidence:\
+    \ an SAP AE has sent an introduction email, set up a three-way meeting, or listed\
+    \ the firm as a co-sell partner in the SAP co-sell portal for a specific account.\
+    \ Does NOT qualify: informal LinkedIn connection with an SAP employee who has\
+    \ not made a specific referral; past SAP event attendance; general partner relationship\
+    \ with SAP SE without a named account-specific co-sell nomination. CRITICAL: this\
+    \ signal indicates channel engagement, NOT end-customer qualification. An account\
+    \ with S_SAP_FIELD_CO_SELL is not qualified until S_JOULE_INTEREST or Q_BUDGET_CONFIRMED\
+    \ is also present from the end-customer directly.\n — Company overview §5 channel\
+    \ mix: SAP-field co-sell is the #1 deal-volume source (~55% of pipeline) but has\
+    \ a low conversion rate (~22% to signed deal). 03_channel_interview.md §2: the\
+    \ SAP AE failure mode (channel mirage) is the most costly qualification error.\
+    \ L3 (SAP AE-referred retail company, 45 days wasted) confirmed that AE enthusiasm\
+    \ ≠ end-customer budget. This signal is a routing signal (route to Alliances Owner\
+    \ per 04_qualification_interview.md §3) and a channel-noise guard when present\
+    \ without end-customer qualification evidence.\n (channel_overrides.yaml)"
+  - "added custom signal S_SI_PARTNER_INVOLVED: Evidence that a Systems Integrator\
+    \ (Big4 consulting firm or large IT consulting partner) is running or bidding\
+    \ on an SAP transformation program at the account, and has engaged or is evaluating\
+    \ this firm as a Joule/AI specialist subcontractor. Qualifying evidence: a Big4\
+    \ MD or Partner has reached out about subcontracting; the firm is named in a Big4\
+    \ proposal or SOW as a Joule specialist; a signed prime contract exists with a\
+    \ named SOW slot for Joule work. Does NOT qualify: a Big4 relationship at the\
+    \ account level without a live program; an SI firm that lost the prime contract;\
+    \ an SI exploring subcontractors for a proposal they have not yet won. CRITICAL:\
+    \ this signal indicates partner pipeline, not direct end-customer qualification.\
+    \ The end-customer budget is confirmed by the prime contract, not by direct end-customer\
+    \ conversation in SI-partner cases.\n — Company overview §5 channel mix: Big4/SI\
+    \ pull-through is the #2 deal-volume source (~30% of pipeline) and the highest-quality\
+    \ leads when the prime contract is signed. 03_channel_interview.md §3: the Big4\
+    \ MD relationship failure mode (4 months invested, prime contract lost) is a major\
+    \ time sink. 05_failure_modes_interview.md FM-SAP-03 documents this failure mode.\
+    \ The signal is only high-quality when a signed prime contract or final-stage\
+    \ LOI is confirmed. Route to SI-Partner Lead per 04_qualification_interview.md\
+    \ §3 for prime contract confirmation before activating in pipeline.\n (channel_overrides.yaml)"
+  - "added intent_topics ['AI in ERP', 'AI in SAP', 'BTP GenAI Hub', 'ECC to S/4HANA\
+    \ migration', 'FI period-close automation', 'GROW with SAP', 'MM invoice matching\
+    \ AI', 'RISE with SAP', 'S/4HANA migration', 'SAP AI implementation', 'SAP BTP\
+    \ AI Core', 'SAP Business Technology Platform', 'SAP ECC sunset 2027', 'SAP Joule',\
+    \ 'SAP Joule implementation', 'SAP embedded analytics AI', 'SAP generative AI',\
+    \ 'SAP intelligent automation', 'SAP maintenance end date', 'SAP modernization',\
+    \ 'SD order exception management', 'clean core SAP'] — Client delivers Joule and\
+    \ BTP AI Core implementation on SAP ECC/S/4HANA landscapes (01_company_overview.md\
+    \ §1). The add list contains topics a prospect evaluating or planning Joule/AI-in-ERP\
+    \ work would produce as intent signals — these map directly to the firm's service\
+    \ lines: Readiness Assessment, Joule Pilot Sprint, S/4HANA Migration + AI Uplift.\
+    \ S/4HANA migration and ECC sunset topics are included because the migration timeline\
+    \ is the primary qualification gate (02_icp_interview.md §1). Clean core is included\
+    \ as a pre-migration signal that can indicate Joule readiness within 12-18 months.\
+    \ Deprioritize list contains high-volume SAP-adjacent signals that do not indicate\
+    \ implementation buying intent (licensing, training, generic ERP selection, non-SAP\
+    \ ERP evaluation). Source: SAP product documentation and 03_channel_interview.md\
+    \ §5 warm-prospect definition.\n (modifier_overrides.yaml)"
+  - "deprioritized intent_topics ['SAP certification', 'SAP licensing negotiation',\
+    \ 'SAP price optimization', 'SAP reselling', 'SAP training courses', 'generic\
+    \ ERP selection', 'non-SAP ERP evaluation'] — Client delivers Joule and BTP AI\
+    \ Core implementation on SAP ECC/S/4HANA landscapes (01_company_overview.md §1).\
+    \ The add list contains topics a prospect evaluating or planning Joule/AI-in-ERP\
+    \ work would produce as intent signals — these map directly to the firm's service\
+    \ lines: Readiness Assessment, Joule Pilot Sprint, S/4HANA Migration + AI Uplift.\
+    \ S/4HANA migration and ECC sunset topics are included because the migration timeline\
+    \ is the primary qualification gate (02_icp_interview.md §1). Clean core is included\
+    \ as a pre-migration signal that can indicate Joule readiness within 12-18 months.\
+    \ Deprioritize list contains high-volume SAP-adjacent signals that do not indicate\
+    \ implementation buying intent (licensing, training, generic ERP selection, non-SAP\
+    \ ERP evaluation). Source: SAP product documentation and 03_channel_interview.md\
+    \ §5 warm-prospect definition.\n (modifier_overrides.yaml)"
+  - "disqualify rule: A_TECH_STACK_ITEM not contains 'SAP' — Non-SAP ERP accounts\
+    \ are a hard disqualification. The firm's entire service offering (Joule implementation,\
+    \ BTP AI Core, S/4HANA migration + AI uplift) is SAP-specific. Oracle Fusion,\
+    \ Workday, Dynamics 365, and NetSuite accounts cannot use Joule and cannot become\
+    \ clients regardless of size, budget, or expressed AI interest. Source: 02_icp_interview.md\
+    \ §4 anti-ICP #1.\n (policy_overrides.yaml)"
+  - "disqualify rule: Q_NEED_ARTICULATED is null AND Q_TIMELINE_STATED is null — No\
+    \ named use case AND no stated timeline = SAP tire-kicker / exploratory inquiry.\
+    \ This pattern — interest in \"AI in SAP\" without a specific process problem\
+    \ or project timeline — is the most common wasted-discovery pattern. The firm\
+    \ uses the test \"does the prospect say what SAP process they want to improve\
+    \ and by when?\" If both are absent after two discovery sessions, move to 6-month\
+    \ nurture. Source: 04_qualification_interview.md §1 use-case gate, 02_icp_interview.md\
+    \ §4 \"no named AI use case after two discovery sessions = tire-kicker.\"\n (policy_overrides.yaml)"
+  - "disqualify rule: Q_BUDGET_CONFIRMED is null AND Q_TIMELINE_STATED is null AND\
+    \ S_S4_MIGRATION_TIMELINE is null — ECC account with no S/4 roadmap and no pilot\
+    \ budget = multi-year nurture. This is the profile of L1 (energy company, DQ'd\
+    \ after Readiness Assessment): large SAP footprint on ECC 6.0, no funded S/4 migration,\
+    \ no pilot budget. Without an S/4 migration timeline or confirmed budget, the\
+    \ Joule implementation is technically and commercially unviable. Cost: 60 days\
+    \ of discovery time on L1. Do not activate in pipeline; place in 18-month nurture\
+    \ cycle. Source: 02_icp_interview.md §4 anti-ICP #2, 05_failure_modes_interview.md\
+    \ FM-SAP-01.\n (policy_overrides.yaml)"
+  - "auto_pass rule: Q_AUTHORITY_IDENTIFIED AND Q_NEED_ARTICULATED AND Q_BUDGET_CONFIRMED\
+    \ AND S_JOULE_INTEREST AND confidence > 0.75 — All four qualification gates confirmed\
+    \ at high confidence: executive sponsor (CIO/CFO) engaged, named Joule use case\
+    \ from the end-customer, budget $150k-$500k confirmed or in active procurement,\
+    \ and direct Joule interest (not SAP AE-suggested). This combination predicts\
+    \ high conversion probability based on P1 and P3 deal profiles. P1 had all four\
+    \ confirmed by end of discovery and closed in 14 weeks; P3 had all four confirmed\
+    \ by the first call (peer referral pre-qualified) and closed in 10 weeks. Route\
+    \ to AE for proposal scoping immediately. Source: 04_qualification_interview.md\
+    \ §1 auto-pass criteria, 01_company_overview.md §3 deal economics.\n (policy_overrides.yaml)"
+  - "auto_pass rule: S_RISE_ADOPTION AND Q_AUTHORITY_IDENTIFIED AND Q_NEED_ARTICULATED\
+    \ AND confidence > 0.70 — RISE with SAP account with identified authority and\
+    \ named need: RISE subscription includes Joule entitlement and BTP credits, meaning\
+    \ there is no infrastructure barrier to a Joule pilot. When the end-customer has\
+    \ RISE confirmed plus an executive sponsor and a named use case, the implementation\
+    \ risk is lower than on-prem and the budget is likely already accounted for in\
+    \ the RISE contract. P2 (retail, $410k, RISE customer) confirms this profile.\
+    \ The confidence threshold is slightly lower (0.70) because RISE itself is a strong\
+    \ signal that reduces technical risk. Route to AE for proposal scoping. Source:\
+    \ 02_icp_interview.md §1 tech-stack signal #1 (RISE = \"very high signal\").\n\
+    \ (policy_overrides.yaml)"
+  - "hil rule: S_SAP_FIELD_CO_SELL AND Q_BUDGET_CONFIRMED is null — SAP-field co-sell\
+    \ WITHOUT end-customer budget confirmation: this is the \"channel mirage\" guard,\
+    \ the most costly qualification failure mode. An SAP AE referral without direct\
+    \ end-customer budget evidence is NOT qualified. Route to Alliances Owner (not\
+    \ AE) to verify budget with the AE and confirm a direct end-customer meeting before\
+    \ activating. Do not route to AE until budget is confirmed — this avoids the L3\
+    \ pattern (45 days wasted on AE referral with no real budget). SAP AE enthusiasm\
+    \ is a co-sell routing signal, not a qualification signal. Source: 04_qualification_interview.md\
+    \ §3 routing rules, 03_channel_interview.md §2 SAP-field failure mode.\n (policy_overrides.yaml)"
+  - "hil rule: S_SI_PARTNER_INVOLVED AND Q_BUDGET_CONFIRMED is null — SI-partner pull-through\
+    \ WITHOUT prime contract confirmation: Big4 MD relationship without a live program\
+    \ is the \"partner mirage\" failure mode (FM-SAP-03). Route to SI-Partner Lead\
+    \ to confirm prime contract status and SOW slot. Do not activate in pipeline until\
+    \ prime contract signed or final-stage LOI. Investing delivery capacity in unconfirmed\
+    \ SI-partner pursuits is a high-cost failure mode that occurred twice in the last\
+    \ 12 months. Source: 04_qualification_interview.md §3 routing rules, 03_channel_interview.md\
+    \ §3 SI-partner failure mode.\n (policy_overrides.yaml)"
+  - "hil rule: Q_AUTHORITY_IDENTIFIED AND Q_NEED_ARTICULATED AND S_S4_MIGRATION_TIMELINE\
+    \ AND Q_BUDGET_CONFIRMED is null — Executive sponsor and named use case confirmed,\
+    \ S/4 migration timeline confirmed, but budget not yet confirmed: this account\
+    \ has high intent but the budget process is behind. These accounts often convert\
+    \ within one budget cycle if pursued correctly. Route to AE for direct CFO/CIO\
+    \ budget conversation. Do not move to auto-pass until budget is confirmed — timeline\
+    \ + need without budget is L2 risk profile (manufacturer lost to Accenture because\
+    \ CFO engagement was insufficient). Source: 04_qualification_interview.md §2 (Q_BUDGET_CONFIRMED\
+    \ evidence gate), 02_icp_interview.md §3 L2 deal loss.\n (policy_overrides.yaml)"
+  - "hil rule: S_CLEAN_CORE_INITIATIVE AND S_S4_MIGRATION_TIMELINE AND Q_NEED_ARTICULATED\
+    \ is null — Clean core initiative + S/4 migration timeline but no named use case:\
+    \ this account is on the right technical trajectory but has not yet identified\
+    \ a specific Joule use case. These are high-value nurture accounts — technically\
+    \ ready within 12 months but not yet a buyer. Route to AE for nurture call: goal\
+    \ is to help the prospect identify a high-ROI Joule use case, not to close immediately.\
+    \ FM-SAP-09 notes that accounts in clean core + RISE migration mode are often\
+    \ missed because they don't yet have a named use case. Proactive nurture converts\
+    \ these in 6-12 months. Source: 05_failure_modes_interview.md FM-SAP-09, FM-SAP-07.\n\
+    \ (policy_overrides.yaml)"
+  - added failure_mode sap_fm01_ecc_only_no_roadmap.py (failure_mode_additions/sap_fm01_ecc_only_no_roadmap.py)
+  - added failure_mode sap_fm02_channel_mirage_ae_excitement.py (failure_mode_additions/sap_fm02_channel_mirage_ae_excitement.py)
+  - added failure_mode sap_fm03_partner_mirage_no_live_program.py (failure_mode_additions/sap_fm03_partner_mirage_no_live_program.py)
+  - added failure_mode sap_fm04_joule_interest_from_sap_marketing.py (failure_mode_additions/sap_fm04_joule_interest_from_sap_marketing.py)
+  - added failure_mode sap_fm05_rise_migration_as_joule_intent.py (failure_mode_additions/sap_fm05_rise_migration_as_joule_intent.py)
+  - added failure_mode sap_fm06_sap_vp_title_inflation_reseller.py (failure_mode_additions/sap_fm06_sap_vp_title_inflation_reseller.py)
+  - added failure_mode sap_fm07_clean_core_false_positive.py (failure_mode_additions/sap_fm07_clean_core_false_positive.py)
+  - added failure_mode sap_fm08_stale_sap_module_breadth.py (failure_mode_additions/sap_fm08_stale_sap_module_breadth.py)
+  schema: gtm_sapjoule_v1.py
+overrides:
+  channel_overrides.yaml: sha256:df06f2c720723709bd1a04c4d63ba2f2fe21437861795028d0d267c7d530b76d
+  icp_overrides.yaml: sha256:3b742d6def5b6eb80bab71ef1caf894b2e31e5aaf716a8d9acf7f869e981b914
+  modifier_overrides.yaml: sha256:e233271984e7819cceaa3834df9f6aecebf85c506b8a67bf04c0054d38527361
+  policy_overrides.yaml: sha256:fca64571c318935d8968b080210761a399c99d78c42f3e4a755ebd5b1de6b159
