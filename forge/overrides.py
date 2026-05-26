@@ -32,6 +32,7 @@ and ``FIXTURE_SOURCE`` following the same convention as the baseline failure mod
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
 from typing import Any
 
@@ -48,6 +49,12 @@ _VALID_LABEL_VALUES: frozenset[str] = frozenset(lbl.value for lbl in GtmLabel)
 # Also accept enum member names (e.g. "A_EMPLOYEE_RANGE") as valid ICP override keys.
 # The merge engine (forge/merge/__init__.py) resolves both forms via _LABEL_VALUE_BY_KEY.
 _VALID_LABEL_KEYS: frozenset[str] = _VALID_LABEL_VALUES | frozenset(lbl.name for lbl in GtmLabel)
+
+# Tokens in a policy condition string that look like a GtmLabel member name:
+# a label family prefix (A_/C_/S_/E_/Q_) followed by uppercase letters/digits/_.
+# This is deliberately conservative — it will not match normal words like
+# AND, OR, is, null, confidence, numbers, or operators.
+_LABEL_TOKEN_RE = re.compile(r"\b[ACSEQ]_[A-Z0-9_]+\b")
 
 
 def _validate_label(value: str) -> str:
@@ -233,5 +240,22 @@ def check_label_refs(bundle: OverrideBundle) -> list[str]:
             errors.append(
                 f"channel_overrides.signal_weights: {label_val!r} is not a valid GtmLabel"
             )
+
+    # Scan policy condition strings for label-name-shaped tokens (e.g.
+    # "Q_BUDGET_CONFIRMED AND Q_AUTHORITY_IDENTIFIED"). This catches the
+    # "renamed a label but forgot to update the policy" bug class.
+    rule_groups = (
+        ("disqualification_rules", bundle.policy.disqualification_rules),
+        ("auto_pass_rules", bundle.policy.auto_pass_rules),
+        ("hil_rules", bundle.policy.hil_rules),
+    )
+    for group_name, rules in rule_groups:
+        for rule in rules:
+            for token in _LABEL_TOKEN_RE.findall(rule.condition):
+                if token not in _VALID_LABEL_KEYS:
+                    errors.append(
+                        f"policy_overrides.{group_name}: {token!r} in condition "
+                        f"{rule.condition!r} is not a valid GtmLabel"
+                    )
 
     return errors

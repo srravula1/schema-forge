@@ -385,3 +385,51 @@ class TestRenamedLabelBug:
         assert not result.ok
         check_map = {c.name: c for c in result.checks}
         assert not check_map["override_label_refs"].passed
+
+    def test_bad_label_in_policy_condition_fails(self, tmp_path):
+        """A label referenced inside a policy condition that doesn't exist must fail."""
+        from forge.validate import run_validate
+
+        eng = _make_engagement(tmp_path)
+        _write_valid_overrides(eng)
+        _run_generate(eng)
+
+        # Post-generate, corrupt the policy condition to reference a non-existent label.
+        (eng / "03_overrides" / "policy_overrides.yaml").write_text(
+            textwrap.dedent("""\
+                disqualification_rules:
+                  - condition: "Q_NOT_A_REAL_LABEL is null"
+                    rationale: "bad"
+            """),
+            encoding="utf-8",
+        )
+        rc = _run_validate(eng)
+        assert rc != 0, "validate must reject an unknown label in a policy condition"
+
+        result = run_validate(eng)
+        assert not result.ok
+        check_map = {c.name: c for c in result.checks}
+        assert not check_map["override_label_refs"].passed
+        assert "Q_NOT_A_REAL_LABEL" in check_map["override_label_refs"].detail
+
+    def test_valid_labels_in_policy_condition_pass(self, tmp_path):
+        """A condition referencing real labels (and AND/OR keywords) must NOT be flagged."""
+        from forge.validate import run_validate
+
+        eng = _make_engagement(tmp_path)
+        _write_valid_overrides(eng)
+        _run_generate(eng)
+
+        (eng / "03_overrides" / "policy_overrides.yaml").write_text(
+            textwrap.dedent("""\
+                disqualification_rules:
+                  - condition: "Q_BUDGET_CONFIRMED AND Q_AUTHORITY_IDENTIFIED"
+                    rationale: "Both qualification signals required"
+            """),
+            encoding="utf-8",
+        )
+        result = run_validate(eng)
+        check_map = {c.name: c for c in result.checks}
+        assert check_map["override_label_refs"].passed, (
+            f"valid labels must not be flagged: {check_map['override_label_refs'].detail}"
+        )
