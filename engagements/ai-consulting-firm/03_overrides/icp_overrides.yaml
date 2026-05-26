@@ -1,0 +1,55 @@
+# icp_overrides.yaml — REVIEWED (post-extract-overrides human review, 2026-05-25)
+# Source interviews: 02_icp_interview.md §§1-3, §5 (deal patterns + outsider question)
+# Reviewed and edited by FDE: all rationale fields verified against interview transcript.
+#
+# These overrides narrow the valid value space for account-family labels.
+# Merge semantics: these produce additional sentences in extraction_guidance()
+# and drive disqualification logic in the policy module.
+
+A_EMPLOYEE_RANGE:
+  include:
+    - "11-50"
+    - "51-200"
+  exclude:
+    - "1-10"
+    - "201-1000"
+    - "1001-5000"
+    - "5000+"
+  rationale: >
+    5 closed-won deals ranged from 40–120 employees (median ~85). Deal L-1 (300 employees)
+    was lost on team size credibility. Regret R-1 was a 12-employee seed company that lacked
+    data infrastructure. Internal analysis: under 20 employees = insufficient internal
+    infrastructure to absorb the engagement; over 200 = procurement friction + team size
+    credibility gap. Sweet spot is 30–200, mapped to '11-50' and '51-200' buckets.
+
+A_INDUSTRY:
+  preferred:
+    - "AI/ML services"
+    - "SaaS"
+    - "Professional services"
+    - "Data infrastructure"
+    - "Legal technology"
+    - "HR technology"
+    - "Developer tools"
+  rationale: >
+    Won deals concentrated in technical services verticals with existing engineering teams:
+    legal tech (W-1), AI/ML services (W-2), HR advisory (W-3), data infra (W-4), vertical
+    SaaS (W-5). The critical filter is 'existing technical team' — the industry itself matters
+    less than whether the company has engineers who can own the work after delivery.
+    E-commerce, retail, and consumer verticals excluded — these typically lack internal
+    technical capacity at the 50–200 employee range.
+
+A_FUNDING_STAGE:
+  exclude:
+    - "pre_seed"
+    - "seed"
+  rationale: >
+    Seed companies consistently fail the project readiness check: insufficient data
+    infrastructure, no named internal owner, no process for absorbing a fixed-scope
+    engagement. Regret R-1 (seed-stage, 12 employees) confirmed the pattern — good
+    founder, wrong organizational readiness. Pre-seed explicitly excluded.
+    Bootstrapped companies are NOT excluded if they show positive cash flow and project
+    readiness (Deal W-3 was bootstrapped and a strong engagement). Funding stage is a
+    proxy; the real filter is 'can they write a $50k+ check and are they project-ready.'
+    Use funding stage as an initial screen; use project readiness questions to override
+    the screen when evidence suggests a bootstrapped company is ready.

@@ -1,0 +1,51 @@
+# channel_overrides.yaml — REVIEWED (post-extract-overrides human review, 2026-05-25)
+# Source interviews: 03_channel_interview.md §§1-5 (signal patterns, warm-prospect definition)
+# Reviewed and edited by FDE: signal weights calibrated against won/lost deal channel attribution.
+#
+# Signal weights: 0.0 = ignore, 0.5 = moderate signal, 1.0 = strong signal
+# Custom signals: added to schema as derived labels
+
+signal_weights:
+  # Hiring trigger: relevant but NOT a primary buying signal for this firm.
+  # AI engineering hires indicate internal AI momentum — useful as a warm-up signal
+  # but not a direct buying trigger. Scored below baseline default.
+  signal.hiring_trigger: 0.35
+
+  # Tech adoption: strong signal. When a company has adopted an LLM or AI platform
+  # (OpenAI API, Anthropic, Vertex AI), they are likely in the "now what do we do
+  # with this" phase — which is exactly when they hire us.
+  signal.tech_adoption: 0.80
+
+  # Funding trigger: moderate signal. New funding creates budget capacity but does not
+  # indicate a specific AI project. Series A/B closes are worth a nurture touch;
+  # they rarely predict a near-term purchase without other signals.
+  signal.funding_trigger: 0.55
+
+  # Pain point mention: highest-weight signal. When a prospect articulates a specific
+  # AI-related problem ("our RAG system has 40% hallucination rate"), this directly
+  # predicts buying intent. The founder identified this as the primary buying signal
+  # in channel interview §2: "a vendor name, a specific failure mode, and a business
+  # context in the first message is almost always a buyer."
+  signal.pain_point_mention: 0.92
+
+  # Intent topic: high signal when the topic is in our delivery areas (LLM eval,
+  # RAG implementation, AI governance). Lower when generic (e.g., "AI trends").
+  signal.intent_topic: 0.78
+
+custom_signals:
+  - name: S_LINKEDIN_THOUGHT_LEADERSHIP_ENGAGEMENT
+    definition: >
+      Prospect has engaged with founder LinkedIn content on AI/LLM topics in the last 14 days,
+      with engagement that contains specific technical or business context (not generic 'great post'
+      comments). Qualifying engagement includes: comments describing a specific problem the prospect
+      is facing, DMs with a business-specific AI question, or reshares with context that reveals
+      organizational relevance. Does NOT qualify: generic likes, 'great insights' comments,
+      single engagement events without follow-on activity.
+    rationale: >
+      Channel interview §4: 60–70% of inbound deal flow starts with founder LinkedIn thought
+      leadership. The key signal is not engagement volume but engagement specificity — a prospect
+      who comments on 3 posts about RAG evaluation with technical questions is a buyer candidate;
+      a prospect who likes 50 posts is a follower. The 14-day recency window captures active
+      research behavior vs. passive interest. This signal is the primary trigger for moving a
+      prospect from nurture to active qualification.
+    add_to_schema: true

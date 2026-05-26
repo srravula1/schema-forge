@@ -241,6 +241,15 @@ def check_label_refs(bundle: OverrideBundle) -> list[str]:
                 f"channel_overrides.signal_weights: {label_val!r} is not a valid GtmLabel"
             )
 
+    # Custom signals declared in this engagement's channel_overrides become real
+    # labels in the generated gtm_<client>@v1 schema, so they are valid reference
+    # targets in policy conditions (see plan §5's S_LINKEDIN_THOUGHT_LEADERSHIP_ENGAGEMENT
+    # hil rule). Undeclared label-shaped tokens are still reported.
+    declared_custom_signals = frozenset(
+        cs.name for cs in bundle.channel.custom_signals if cs.add_to_schema
+    )
+    valid_condition_tokens = _VALID_LABEL_KEYS | declared_custom_signals
+
     # Scan policy condition strings for label-name-shaped tokens (e.g.
     # "Q_BUDGET_CONFIRMED AND Q_AUTHORITY_IDENTIFIED"). This catches the
     # "renamed a label but forgot to update the policy" bug class.
@@ -252,7 +261,7 @@ def check_label_refs(bundle: OverrideBundle) -> list[str]:
     for group_name, rules in rule_groups:
         for rule in rules:
             for token in _LABEL_TOKEN_RE.findall(rule.condition):
-                if token not in _VALID_LABEL_KEYS:
+                if token not in valid_condition_tokens:
                     errors.append(
                         f"policy_overrides.{group_name}: {token!r} in condition "
                         f"{rule.condition!r} is not a valid GtmLabel"

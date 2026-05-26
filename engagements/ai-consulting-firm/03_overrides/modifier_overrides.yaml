@@ -1,0 +1,43 @@
+# modifier_overrides.yaml — REVIEWED (post-extract-overrides human review, 2026-05-25)
+# Source interviews: 01_company_overview.md §1 (service types), 03_channel_interview.md §5
+#                   (warm-prospect definition, intent signals)
+# Reviewed and edited by FDE: topics verified against actual delivery service areas.
+#
+# These overrides add/restrict entries in the modifier ontology (modifiers.yaml).
+# The intent_topics.add list is used during intent signal extraction to recognize
+# topics that are directly relevant to this firm's delivery areas.
+
+intent_topics:
+  add:
+    - "LLM evaluation"
+    - "AI governance"
+    - "RAG implementation"
+    - "RAG evaluation"
+    - "LLM hallucination reduction"
+    - "AI system reliability"
+    - "model evaluation frameworks"
+    - "LLM fine-tuning"
+    - "retrieval augmented generation"
+    - "AI for professional services"
+    - "enterprise AI deployment"
+    - "LLM benchmarking"
+    - "AI observability"
+    - "prompt engineering"
+    - "vector database selection"
+  deprioritize:
+    - "data warehouse migration"
+    - "business intelligence"
+    - "CRM implementation"
+    - "ERP selection"
+    - "cloud migration"
+    - "no-code AI tools"
+  rationale: >
+    Client delivers RAG implementation, LLM evaluation/governance, and AI architecture
+    advisory (01_company_overview.md §1). The add list contains topics a prospect
+    researching these services would produce as intent signals — these map directly
+    to the firm's three core service lines. The deprioritize list contains high-volume
+    intent topics that indicate technology evaluation work adjacent to AI consulting
+    but not directly relevant to this firm's offering (data warehousing, BI, ERP
+    selection are dealt with by different consulting categories). Warm-prospect
+    definition from channel interview §5: prospects asking specific questions about
+    LLM evaluation, RAG architecture, or AI governance are 30-day pre-buy signals.

@@ -1,0 +1,134 @@
+baseline_version: gtm_v1.0
+client: ai-consulting-firm
+generated_at: '2026-05-26T01:01:37Z'
+output:
+  changes_from_baseline:
+  - "A_EMPLOYEE_RANGE: include ['11-50', '51-200']; exclude ['1-10', '201-1000', '1001-5000',\
+    \ '5000+'] — 5 closed-won deals ranged from 40–120 employees (median ~85). Deal\
+    \ L-1 (300 employees) was lost on team size credibility. Regret R-1 was a 12-employee\
+    \ seed company that lacked data infrastructure. Internal analysis: under 20 employees\
+    \ = insufficient internal infrastructure to absorb the engagement; over 200 =\
+    \ procurement friction + team size credibility gap. Sweet spot is 30–200, mapped\
+    \ to '11-50' and '51-200' buckets.\n (icp_overrides.yaml)"
+  - "A_FUNDING_STAGE: exclude ['pre_seed', 'seed'] — Seed companies consistently fail\
+    \ the project readiness check: insufficient data infrastructure, no named internal\
+    \ owner, no process for absorbing a fixed-scope engagement. Regret R-1 (seed-stage,\
+    \ 12 employees) confirmed the pattern — good founder, wrong organizational readiness.\
+    \ Pre-seed explicitly excluded. Bootstrapped companies are NOT excluded if they\
+    \ show positive cash flow and project readiness (Deal W-3 was bootstrapped and\
+    \ a strong engagement). Funding stage is a proxy; the real filter is 'can they\
+    \ write a $50k+ check and are they project-ready.' Use funding stage as an initial\
+    \ screen; use project readiness questions to override the screen when evidence\
+    \ suggests a bootstrapped company is ready.\n (icp_overrides.yaml)"
+  - "A_INDUSTRY: preferred ['AI/ML services', 'SaaS', 'Professional services', 'Data\
+    \ infrastructure', 'Legal technology', 'HR technology', 'Developer tools'] — Won\
+    \ deals concentrated in technical services verticals with existing engineering\
+    \ teams: legal tech (W-1), AI/ML services (W-2), HR advisory (W-3), data infra\
+    \ (W-4), vertical SaaS (W-5). The critical filter is 'existing technical team'\
+    \ — the industry itself matters less than whether the company has engineers who\
+    \ can own the work after delivery. E-commerce, retail, and consumer verticals\
+    \ excluded — these typically lack internal technical capacity at the 50–200 employee\
+    \ range.\n (icp_overrides.yaml)"
+  - signal_weight signal.funding_trigger=0.55 (channel_overrides.yaml)
+  - signal_weight signal.hiring_trigger=0.35 (channel_overrides.yaml)
+  - signal_weight signal.intent_topic=0.78 (channel_overrides.yaml)
+  - signal_weight signal.pain_point_mention=0.92 (channel_overrides.yaml)
+  - signal_weight signal.tech_adoption=0.8 (channel_overrides.yaml)
+  - "added custom signal S_LINKEDIN_THOUGHT_LEADERSHIP_ENGAGEMENT: Prospect has engaged\
+    \ with founder LinkedIn content on AI/LLM topics in the last 14 days, with engagement\
+    \ that contains specific technical or business context (not generic 'great post'\
+    \ comments). Qualifying engagement includes: comments describing a specific problem\
+    \ the prospect is facing, DMs with a business-specific AI question, or reshares\
+    \ with context that reveals organizational relevance. Does NOT qualify: generic\
+    \ likes, 'great insights' comments, single engagement events without follow-on\
+    \ activity.\n — Channel interview §4: 60–70% of inbound deal flow starts with\
+    \ founder LinkedIn thought leadership. The key signal is not engagement volume\
+    \ but engagement specificity — a prospect who comments on 3 posts about RAG evaluation\
+    \ with technical questions is a buyer candidate; a prospect who likes 50 posts\
+    \ is a follower. The 14-day recency window captures active research behavior vs.\
+    \ passive interest. This signal is the primary trigger for moving a prospect from\
+    \ nurture to active qualification.\n (channel_overrides.yaml)"
+  - "added intent_topics ['AI for professional services', 'AI governance', 'AI observability',\
+    \ 'AI system reliability', 'LLM benchmarking', 'LLM evaluation', 'LLM fine-tuning',\
+    \ 'LLM hallucination reduction', 'RAG evaluation', 'RAG implementation', 'enterprise\
+    \ AI deployment', 'model evaluation frameworks', 'prompt engineering', 'retrieval\
+    \ augmented generation', 'vector database selection'] — Client delivers RAG implementation,\
+    \ LLM evaluation/governance, and AI architecture advisory (01_company_overview.md\
+    \ §1). The add list contains topics a prospect researching these services would\
+    \ produce as intent signals — these map directly to the firm's three core service\
+    \ lines. The deprioritize list contains high-volume intent topics that indicate\
+    \ technology evaluation work adjacent to AI consulting but not directly relevant\
+    \ to this firm's offering (data warehousing, BI, ERP selection are dealt with\
+    \ by different consulting categories). Warm-prospect definition from channel interview\
+    \ §5: prospects asking specific questions about LLM evaluation, RAG architecture,\
+    \ or AI governance are 30-day pre-buy signals.\n (modifier_overrides.yaml)"
+  - "deprioritized intent_topics ['CRM implementation', 'ERP selection', 'business\
+    \ intelligence', 'cloud migration', 'data warehouse migration', 'no-code AI tools']\
+    \ — Client delivers RAG implementation, LLM evaluation/governance, and AI architecture\
+    \ advisory (01_company_overview.md §1). The add list contains topics a prospect\
+    \ researching these services would produce as intent signals — these map directly\
+    \ to the firm's three core service lines. The deprioritize list contains high-volume\
+    \ intent topics that indicate technology evaluation work adjacent to AI consulting\
+    \ but not directly relevant to this firm's offering (data warehousing, BI, ERP\
+    \ selection are dealt with by different consulting categories). Warm-prospect\
+    \ definition from channel interview §5: prospects asking specific questions about\
+    \ LLM evaluation, RAG architecture, or AI governance are 30-day pre-buy signals.\n\
+    \ (modifier_overrides.yaml)"
+  - "disqualify rule: A_EMPLOYEE_RANGE in ['1-10'] — Under 10 employees: insufficient\
+    \ internal infrastructure to absorb a $50k+ engagement. These companies lack a\
+    \ dedicated engineering owner, have immature data practices, and cannot allocate\
+    \ 20% of a technical lead's time to an engagement. Confirmed by regret R-1 (seed-stage,\
+    \ 12 employees — data unready) and multiple explicit disqualifications in the\
+    \ ICP interview. The '1-10' bucket maps to companies under ~10 people.\n (policy_overrides.yaml)"
+  - "disqualify rule: A_FUNDING_STAGE in ['pre_seed', 'seed'] — Pre-seed and seed\
+    \ companies routinely fail the three project readiness gates: data readiness (no\
+    \ clean corpus), owner readiness (no named technical owner), infrastructure readiness\
+    \ (no production cloud deployment). Budget also typically insufficient for $50k+\
+    \ sprint engagements. Confirmed by regret R-1 and ICP interview analysis. Note:\
+    \ bootstrapped companies are NOT disqualified — only VC-backed pre-revenue stages.\n\
+    \ (policy_overrides.yaml)"
+  - "disqualify rule: Q_NEED_ARTICULATED is null AND Q_TIMELINE_STATED is null — 'AI\
+    \ tire-kicker / fake yes' pattern: no articulated need + no stated timeline =\
+    \ exploratory intent, not a real project. Confirmed by failure modes interview\
+    \ §3 and ICP interview §5 (outsider question): \"The word 'explore' is a red flag.\
+    \ Real buyers say 'we have X problem and we need to solve it by Y date.'\" Both\
+    \ signals absent together is a reliable disqualification trigger.\n (policy_overrides.yaml)"
+  - "auto_pass rule: Q_BUDGET_CONFIRMED AND Q_AUTHORITY_IDENTIFIED AND Q_NEED_ARTICULATED\
+    \ AND confidence > 0.75 — Three MEDDIC evidence gates confirmed (budget, authority,\
+    \ need) at high confidence. Won-deal analysis: all 5 closed-won deals had all\
+    \ three confirmed by end of discovery. When all three are present with confidence\
+    \ > 0.75, this combination predicts >80% close rate in the deal history reviewed.\
+    \ Route to AE for proposal scoping. The fourth gate (Q_TIMELINE_STATED) is still\
+    \ required before contract — this rule gates the discovery-to- proposal transition,\
+    \ not discovery-to-contract.\n (policy_overrides.yaml)"
+  - "hil rule: S_LINKEDIN_THOUGHT_LEADERSHIP_ENGAGEMENT AND Q_NEED_ARTICULATED AND\
+    \ confidence > 0.5 — LinkedIn-inbound with articulated need: this is the boundary\
+    \ between AI tire-kicker and real buyer, and automated routing gets it wrong too\
+    \ often. Human review required to assess whether the articulated need is specific\
+    \ (business-contextualized problem) or vague (exploratory). Channel interview\
+    \ §2: \"a vendor name, a specific failure mode, and a business context in the\
+    \ first message is almost always a buyer\" — that specificity check requires human\
+    \ judgment. Route to founder or senior AE for 5-minute assessment. S_LINKEDIN_THOUGHT_LEADERSHIP_ENGAGEMENT\
+    \ is the custom signal defined in channel_overrides.yaml (add_to_schema: true),\
+    \ so it is a valid reference here.\n (policy_overrides.yaml)"
+  - "hil rule: Q_BUDGET_CONFIRMED AND Q_AUTHORITY_IDENTIFIED AND Q_TIMELINE_STATED\
+    \ is null — Budget and authority confirmed but no timeline = possible project\
+    \ not yet real. This combination appeared in 2 of 5 lost deals (L-4: budget cycle\
+    \ miss, L-2: CTO departure caused timing issue). Without a stated timeline, we\
+    \ cannot confirm that the project exists within the current budget cycle. HIL\
+    \ to probe: \"Is this project specifically budgeted for Q[current], and who internally\
+    \ owns the timeline?\"\n (policy_overrides.yaml)"
+  - "hil rule: A_EMPLOYEE_RANGE in ['51-200'] AND A_FUNDING_STAGE in ['series_b',\
+    \ 'series_c', 'series_d_plus'] — Series B/C+ companies in the employee sweet spot:\
+    \ these are high-value but may have procurement friction (see Deal L-1, 300-employee\
+    \ Series C that went to a larger firm on credibility). HIL to assess: is there\
+    \ a procurement process? Does our team size create delivery risk perception? These\
+    \ prospects need a different close motion (more references, possibly a subcontractor\
+    \ structure).\n (policy_overrides.yaml)"
+  - added failure_mode fake_yes_ai_curiosity.py (failure_mode_additions/fake_yes_ai_curiosity.py)
+  schema: gtm_aiconsultingfirm_v1.py
+overrides:
+  channel_overrides.yaml: sha256:d664b8744652307c994881c5e20aae0e23f78e83aac3fc0c5770c1b7bbe1c190
+  icp_overrides.yaml: sha256:a27e40a6c3384946ec892c9838774f31bf41c1a2fc29ec26bab20be1139fb828
+  modifier_overrides.yaml: sha256:97ffb21c87b6739dcab2e5e2e9a77516b24e7a9d7f3d675c85ac1274a8bc217c
+  policy_overrides.yaml: sha256:ab1b29c5daa6e63ba53060e58beb3afc6253c1b7193b0a8d918e1dac7dfcf0db
