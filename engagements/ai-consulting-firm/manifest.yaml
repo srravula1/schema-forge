@@ -1,6 +1,6 @@
 baseline_version: gtm_v1.0
 client: ai-consulting-firm
-generated_at: '2026-05-26T00:55:21Z'
+generated_at: '2026-05-26T01:01:37Z'
 output:
   changes_from_baseline:
   - "A_EMPLOYEE_RANGE: include ['11-50', '51-200']; exclude ['1-10', '201-1000', '1001-5000',\
@@ -101,16 +101,16 @@ output:
     \ Route to AE for proposal scoping. The fourth gate (Q_TIMELINE_STATED) is still\
     \ required before contract — this rule gates the discovery-to- proposal transition,\
     \ not discovery-to-contract.\n (policy_overrides.yaml)"
-  - "hil rule: linkedin_engagement_signal AND Q_NEED_ARTICULATED AND confidence >\
-    \ 0.5 — LinkedIn-inbound with articulated need: this is the boundary between AI\
-    \ tire-kicker and real buyer, and automated routing gets it wrong too often. Human\
-    \ review required to assess whether the articulated need is specific (business-contextualized\
-    \ problem) or vague (exploratory). Channel interview §2: \"a vendor name, a specific\
-    \ failure mode, and a business context in the first message is almost always a\
-    \ buyer\" — that specificity check requires human judgment. Route to founder or\
-    \ senior AE for 5-minute assessment. Note: 'linkedin_engagement_signal' refers\
-    \ to the custom signal S_LINKEDIN_THOUGHT_LEADERSHIP_ENGAGEMENT defined in channel_overrides.yaml.\n\
-    \ (policy_overrides.yaml)"
+  - "hil rule: S_LINKEDIN_THOUGHT_LEADERSHIP_ENGAGEMENT AND Q_NEED_ARTICULATED AND\
+    \ confidence > 0.5 — LinkedIn-inbound with articulated need: this is the boundary\
+    \ between AI tire-kicker and real buyer, and automated routing gets it wrong too\
+    \ often. Human review required to assess whether the articulated need is specific\
+    \ (business-contextualized problem) or vague (exploratory). Channel interview\
+    \ §2: \"a vendor name, a specific failure mode, and a business context in the\
+    \ first message is almost always a buyer\" — that specificity check requires human\
+    \ judgment. Route to founder or senior AE for 5-minute assessment. S_LINKEDIN_THOUGHT_LEADERSHIP_ENGAGEMENT\
+    \ is the custom signal defined in channel_overrides.yaml (add_to_schema: true),\
+    \ so it is a valid reference here.\n (policy_overrides.yaml)"
   - "hil rule: Q_BUDGET_CONFIRMED AND Q_AUTHORITY_IDENTIFIED AND Q_TIMELINE_STATED\
     \ is null — Budget and authority confirmed but no timeline = possible project\
     \ not yet real. This combination appeared in 2 of 5 lost deals (L-4: budget cycle\
@@ -131,4 +131,4 @@ overrides:
   channel_overrides.yaml: sha256:d664b8744652307c994881c5e20aae0e23f78e83aac3fc0c5770c1b7bbe1c190
   icp_overrides.yaml: sha256:a27e40a6c3384946ec892c9838774f31bf41c1a2fc29ec26bab20be1139fb828
   modifier_overrides.yaml: sha256:97ffb21c87b6739dcab2e5e2e9a77516b24e7a9d7f3d675c85ac1274a8bc217c
-  policy_overrides.yaml: sha256:48a794585a514370b72a7d986ce6b0c148fa7ad64174738f028cc414b75992ed
+  policy_overrides.yaml: sha256:ab1b29c5daa6e63ba53060e58beb3afc6253c1b7193b0a8d918e1dac7dfcf0db

@@ -64,16 +64,18 @@ uv pip install -e ".[dev]"
 
 # 9. Run full test suite (including new e2e test)
 .venv/bin/pytest -q
-# 219 passed
+# 221 passed
 ```
 
-**Note on the one policy condition fix:** The initial `policy_overrides.yaml` used
-`S_LINKEDIN_THOUGHT_LEADERSHIP_ENGAGEMENT` in a HIL rule condition. The label reference
-checker (`check_label_refs`) correctly flagged this because `S_LINKEDIN_THOUGHT_LEADERSHIP_ENGAGEMENT`
-is a custom signal added via `channel_overrides.yaml` and is not yet in the base `GtmLabel` enum.
-The fix: replaced the token with a plain-language term `linkedin_engagement_signal` (which the
-regex does not match as a label token) and added a rationale note referencing the custom signal.
-This is the exact "renamed label" bug class that `validate` is designed to catch.
+**Note — a `validate` gap surfaced and was fixed:** The `policy_overrides.yaml` HIL rule references
+`S_LINKEDIN_THOUGHT_LEADERSHIP_ENGAGEMENT`, the custom signal declared in `channel_overrides.yaml`
+(`add_to_schema: true`). `check_label_refs` initially flagged it because its valid-label set was the
+base `GtmLabel` enum only — it did not account for custom signals declared in the same engagement,
+even though those become real labels in the generated `gtm_<client>@v1` schema (and plan §5's own
+example references this exact custom signal in a HIL rule). The fix unions the engagement's declared
+custom-signal names into the reference set, so a *declared* custom signal passes while an *undeclared*
+`S_`-shaped token is still rejected (the genuine "renamed label" bug class). The condition now uses the
+real `S_LINKEDIN_THOUGHT_LEADERSHIP_ENGAGEMENT` token.
 
 ---
 

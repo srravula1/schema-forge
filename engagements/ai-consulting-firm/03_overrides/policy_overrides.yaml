@@ -43,7 +43,7 @@ auto_pass_rules:
       proposal transition, not discovery-to-contract.
 
 hil_rules:
-  - condition: "linkedin_engagement_signal AND Q_NEED_ARTICULATED AND confidence > 0.5"
+  - condition: "S_LINKEDIN_THOUGHT_LEADERSHIP_ENGAGEMENT AND Q_NEED_ARTICULATED AND confidence > 0.5"
     rationale: >
       LinkedIn-inbound with articulated need: this is the boundary between AI tire-kicker
       and real buyer, and automated routing gets it wrong too often. Human review required
@@ -51,8 +51,8 @@ hil_rules:
       or vague (exploratory). Channel interview §2: "a vendor name, a specific failure mode,
       and a business context in the first message is almost always a buyer" — that specificity
       check requires human judgment. Route to founder or senior AE for 5-minute assessment.
-      Note: 'linkedin_engagement_signal' refers to the custom signal
-      S_LINKEDIN_THOUGHT_LEADERSHIP_ENGAGEMENT defined in channel_overrides.yaml.
+      S_LINKEDIN_THOUGHT_LEADERSHIP_ENGAGEMENT is the custom signal defined in
+      channel_overrides.yaml (add_to_schema: true), so it is a valid reference here.
 
   - condition: "Q_BUDGET_CONFIRMED AND Q_AUTHORITY_IDENTIFIED AND Q_TIMELINE_STATED is null"
     rationale: >

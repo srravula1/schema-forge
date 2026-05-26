@@ -433,3 +433,41 @@ class TestRenamedLabelBug:
         assert check_map["override_label_refs"].passed, (
             f"valid labels must not be flagged: {check_map['override_label_refs'].detail}"
         )
+
+    def test_declared_custom_signal_in_policy_condition_passes(self, tmp_path):
+        """A custom signal declared in channel_overrides is a valid policy-condition reference (plan §5)."""
+        from forge.validate import run_validate
+
+        eng = _make_engagement(tmp_path)
+        _write_valid_overrides(eng)  # declares S_LINKEDIN_THOUGHT_LEADERSHIP_ENGAGEMENT
+        _run_generate(eng)
+
+        (eng / "03_overrides" / "policy_overrides.yaml").write_text(
+            textwrap.dedent("""\
+                hil_rules:
+                  - condition: "S_LINKEDIN_THOUGHT_LEADERSHIP_ENGAGEMENT AND confidence > 0.5"
+                    rationale: "Always human-verify warm-channel signals"
+            """),
+            encoding="utf-8",
+        )
+        result = run_validate(eng)
+        check_map = {c.name: c for c in result.checks}
+        assert check_map["override_label_refs"].passed, (
+            f"declared custom signal must not be flagged: {check_map['override_label_refs'].detail}"
+        )
+
+    def test_undeclared_custom_signal_in_policy_condition_fails(self, tmp_path):
+        """An S_-shaped token that is neither a baseline label nor a declared custom signal still fails."""
+        eng = _make_engagement(tmp_path)
+        _write_valid_overrides(eng)
+        _run_generate(eng)
+
+        (eng / "03_overrides" / "policy_overrides.yaml").write_text(
+            textwrap.dedent("""\
+                hil_rules:
+                  - condition: "S_UNDECLARED_SIGNAL AND confidence > 0.5"
+                    rationale: "typo'd / never declared"
+            """),
+            encoding="utf-8",
+        )
+        assert _run_validate(eng) != 0, "undeclared S_-token must still be rejected"

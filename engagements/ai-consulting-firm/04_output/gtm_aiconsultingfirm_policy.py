@@ -121,8 +121,8 @@ def compose(
 
 
 # --- Client HIL rules (from policy_overrides) ---
-# HIL if: linkedin_engagement_signal AND Q_NEED_ARTICULATED AND confidence > 0.5
-# Rationale: LinkedIn-inbound with articulated need: this is the boundary between AI tire-kicker and real buyer, and automated routing gets it wrong too often. Human review required to assess whether the articulated need is specific (business-contextualized problem) or vague (exploratory). Channel interview §2: "a vendor name, a specific failure mode, and a business context in the first message is almost always a buyer" — that specificity check requires human judgment. Route to founder or senior AE for 5-minute assessment. Note: 'linkedin_engagement_signal' refers to the custom signal S_LINKEDIN_THOUGHT_LEADERSHIP_ENGAGEMENT defined in channel_overrides.yaml.
+# HIL if: S_LINKEDIN_THOUGHT_LEADERSHIP_ENGAGEMENT AND Q_NEED_ARTICULATED AND confidence > 0.5
+# Rationale: LinkedIn-inbound with articulated need: this is the boundary between AI tire-kicker and real buyer, and automated routing gets it wrong too often. Human review required to assess whether the articulated need is specific (business-contextualized problem) or vague (exploratory). Channel interview §2: "a vendor name, a specific failure mode, and a business context in the first message is almost always a buyer" — that specificity check requires human judgment. Route to founder or senior AE for 5-minute assessment. S_LINKEDIN_THOUGHT_LEADERSHIP_ENGAGEMENT is the custom signal defined in channel_overrides.yaml (add_to_schema: true), so it is a valid reference here.
 
 # HIL if: Q_BUDGET_CONFIRMED AND Q_AUTHORITY_IDENTIFIED AND Q_TIMELINE_STATED is null
 # Rationale: Budget and authority confirmed but no timeline = possible project not yet real. This combination appeared in 2 of 5 lost deals (L-4: budget cycle miss, L-2: CTO departure caused timing issue). Without a stated timeline, we cannot confirm that the project exists within the current budget cycle. HIL to probe: "Is this project specifically budgeted for Q[current], and who internally owns the timeline?"
