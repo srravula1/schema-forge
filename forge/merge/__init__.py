@@ -25,7 +25,18 @@ from typing import Any
 
 import yaml
 
+from forge.domains.gtm.baseline.gtm_schema import GtmLabel
 from forge.overrides import ChannelOverrides, IcpOverrides, ModifierOverrides, OverrideBundle, PolicyOverrides, load_overrides
+
+
+# Map both enum member names (e.g. "A_EMPLOYEE_RANGE") and label values
+# (e.g. "account.employee_range") to the canonical label value. ICP override
+# files may key by either form (§5 of the plan uses member names); guidance
+# keys must always be the label *value*.
+_LABEL_VALUE_BY_KEY: dict[str, str] = {}
+for _lbl in GtmLabel:
+    _LABEL_VALUE_BY_KEY[_lbl.name] = _lbl.value
+    _LABEL_VALUE_BY_KEY[_lbl.value] = _lbl.value
 
 
 # ---------------------------------------------------------------------------
@@ -61,7 +72,13 @@ def merge_schema(baseline_text: str, bundle: OverrideBundle, client: str) -> str
     icp_additions: dict[str, list[str]] = {}  # label_value -> extra sentences
     icp_disq_comments: list[str] = []
 
-    for label_val, lf in sorted(bundle.icp.filters.items()):
+    for label_key, lf in sorted(bundle.icp.filters.items()):
+        # Resolve the override key (member name OR label value) to the label
+        # value. Guidance is keyed by value; an unresolved key is ignored here
+        # (upstream check_label_refs surfaces it as an error).
+        label_val = _LABEL_VALUE_BY_KEY.get(label_key)
+        if label_val is None:
+            continue
         parts: list[str] = []
         if lf.preferred:
             joined = ", ".join(lf.preferred)

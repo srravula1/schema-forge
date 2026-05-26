@@ -44,16 +44,20 @@ def _make_engagement(tmp_path: Path) -> Path:
 def _write_override_yamls(eng: Path) -> None:
     overrides_dir = eng / "03_overrides"
 
+    # Keys use enum MEMBER names (A_EMPLOYEE_RANGE), matching the §5 plan
+    # example. The merge must resolve these to label VALUES
+    # (account.employee_range) when appending guidance — never introduce a
+    # guidance key equal to the member name.
     (overrides_dir / "icp_overrides.yaml").write_text(
         textwrap.dedent("""\
-            account.employee_range:
+            A_EMPLOYEE_RANGE:
               include:
                 - "11-50"
                 - "51-200"
               exclude:
                 - "1-10"
               rationale: "5 won deals all between 25-180 employees"
-            account.industry:
+            A_INDUSTRY:
               preferred:
                 - "Professional services"
                 - "AI/ML services"
@@ -256,6 +260,45 @@ class TestSchemaMerge:
             f"extraction_guidance must include custom signal key {custom_key!r}"
         )
         assert "LinkedIn" in guidance[custom_key] or "linkedin" in guidance[custom_key].lower()
+
+    def test_guidance_keys_exactly_equal_label_values(self, tmp_path):
+        """Contract: guidance keys are EXACTLY the set of label values.
+
+        The fixture narrows A_EMPLOYEE_RANGE (icp override, keyed by member
+        name) AND adds a custom signal (channel override). A regression where
+        the icp append uses the enum member name introduces a stray
+        'A_EMPLOYEE_RANGE' guidance key — this asserts no missing AND no extra.
+        """
+        eng = _make_engagement(tmp_path)
+        _write_override_yamls(eng)
+        _run_generate(eng)
+
+        schema_path = eng / "04_output" / f"gtm_{SLUG}_v1.py"
+        spec = importlib.util.spec_from_file_location(f"gtm_{SLUG}_v1", schema_path)
+        generated = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(generated)
+
+        assert set(generated.extraction_guidance().keys()) == {
+            l.value for l in generated.GtmLabel
+        }
+
+    def test_icp_append_keyed_by_label_value_not_member_name(self, tmp_path):
+        """The §5 preferred/restrict sentence must land on the label VALUE entry."""
+        eng = _make_engagement(tmp_path)
+        _write_override_yamls(eng)
+        _run_generate(eng)
+
+        schema_path = eng / "04_output" / f"gtm_{SLUG}_v1.py"
+        spec = importlib.util.spec_from_file_location(f"gtm_{SLUG}_v1", schema_path)
+        generated = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(generated)
+
+        guidance = generated.extraction_guidance()
+        # No guidance key may equal an enum member name.
+        member_names = {l.name for l in generated.GtmLabel}
+        assert member_names.isdisjoint(guidance.keys())
+        # The appended sentence modifies the existing employee_range definition.
+        assert "11-50" in guidance["account.employee_range"]
 
     def test_schema_has_custom_label_enum_member(self, tmp_path):
         eng = _make_engagement(tmp_path)
