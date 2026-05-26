@@ -1,0 +1,27 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "schema-forge"
+version = "0.0.0"
+description = "CLI schema generator: turns a domain baseline + buyer overrides into the five artifacts the spine consumes."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "pydantic>=2.6",
+    "pyyaml>=6.0",
+    "anthropic>=0.40",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[project.scripts]
+schema-forge = "forge.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["forge"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
