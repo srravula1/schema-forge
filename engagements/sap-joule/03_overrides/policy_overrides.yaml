@@ -1,0 +1,113 @@
+# policy_overrides.yaml — REVIEWED (post-extract-overrides human review, 2026-05-25)
+# Source interviews: 04_qualification_interview.md §§1-4 (evidence gates, routing),
+#                   02_icp_interview.md §§3-4 (deal patterns, anti-ICP),
+#                   03_channel_interview.md §§2-3 (co-sell failure modes, SI pull-through),
+#                   05_failure_modes_interview.md §§1-3 (FM-SAP-01 through FM-SAP-08)
+# Reviewed and edited by FDE: all condition tokens verified against GtmLabel enum values
+#                             and declared custom signals in channel_overrides.yaml.
+#
+# Label references use GtmLabel enum member names (e.g., Q_BUDGET_CONFIRMED) or
+# custom signal names declared in channel_overrides.yaml (e.g., S_SAP_FIELD_CO_SELL).
+# Custom signals declared with add_to_schema: true are valid condition tokens per
+# forge/overrides.py check_label_refs() which unions declared custom signal names
+# into the valid reference set.
+
+disqualification_rules:
+  - condition: "A_TECH_STACK_ITEM not contains 'SAP'"
+    rationale: >
+      Non-SAP ERP accounts are a hard disqualification. The firm's entire service
+      offering (Joule implementation, BTP AI Core, S/4HANA migration + AI uplift)
+      is SAP-specific. Oracle Fusion, Workday, Dynamics 365, and NetSuite accounts
+      cannot use Joule and cannot become clients regardless of size, budget, or
+      expressed AI interest. Source: 02_icp_interview.md §4 anti-ICP #1.
+
+  - condition: "Q_NEED_ARTICULATED is null AND Q_TIMELINE_STATED is null"
+    rationale: >
+      No named use case AND no stated timeline = SAP tire-kicker / exploratory inquiry.
+      This pattern — interest in "AI in SAP" without a specific process problem or
+      project timeline — is the most common wasted-discovery pattern. The firm uses the
+      test "does the prospect say what SAP process they want to improve and by when?"
+      If both are absent after two discovery sessions, move to 6-month nurture.
+      Source: 04_qualification_interview.md §1 use-case gate, 02_icp_interview.md §4
+      "no named AI use case after two discovery sessions = tire-kicker."
+
+  - condition: "Q_BUDGET_CONFIRMED is null AND Q_TIMELINE_STATED is null AND S_S4_MIGRATION_TIMELINE is null"
+    rationale: >
+      ECC account with no S/4 roadmap and no pilot budget = multi-year nurture.
+      This is the profile of L1 (energy company, DQ'd after Readiness Assessment):
+      large SAP footprint on ECC 6.0, no funded S/4 migration, no pilot budget.
+      Without an S/4 migration timeline or confirmed budget, the Joule implementation
+      is technically and commercially unviable. Cost: 60 days of discovery time on L1.
+      Do not activate in pipeline; place in 18-month nurture cycle.
+      Source: 02_icp_interview.md §4 anti-ICP #2, 05_failure_modes_interview.md FM-SAP-01.
+
+auto_pass_rules:
+  - condition: "Q_AUTHORITY_IDENTIFIED AND Q_NEED_ARTICULATED AND Q_BUDGET_CONFIRMED AND S_JOULE_INTEREST AND confidence > 0.75"
+    rationale: >
+      All four qualification gates confirmed at high confidence: executive sponsor
+      (CIO/CFO) engaged, named Joule use case from the end-customer, budget
+      $150k-$500k confirmed or in active procurement, and direct Joule interest
+      (not SAP AE-suggested). This combination predicts high conversion probability
+      based on P1 and P3 deal profiles. P1 had all four confirmed by end of discovery
+      and closed in 14 weeks; P3 had all four confirmed by the first call (peer referral
+      pre-qualified) and closed in 10 weeks. Route to AE for proposal scoping immediately.
+      Source: 04_qualification_interview.md §1 auto-pass criteria, 01_company_overview.md
+      §3 deal economics.
+
+  - condition: "S_RISE_ADOPTION AND Q_AUTHORITY_IDENTIFIED AND Q_NEED_ARTICULATED AND confidence > 0.70"
+    rationale: >
+      RISE with SAP account with identified authority and named need: RISE subscription
+      includes Joule entitlement and BTP credits, meaning there is no infrastructure
+      barrier to a Joule pilot. When the end-customer has RISE confirmed plus an
+      executive sponsor and a named use case, the implementation risk is lower than
+      on-prem and the budget is likely already accounted for in the RISE contract.
+      P2 (retail, $410k, RISE customer) confirms this profile. The confidence threshold
+      is slightly lower (0.70) because RISE itself is a strong signal that reduces
+      technical risk. Route to AE for proposal scoping.
+      Source: 02_icp_interview.md §1 tech-stack signal #1 (RISE = "very high signal").
+
+hil_rules:
+  - condition: "S_SAP_FIELD_CO_SELL AND Q_BUDGET_CONFIRMED is null"
+    rationale: >
+      SAP-field co-sell WITHOUT end-customer budget confirmation: this is the
+      "channel mirage" guard, the most costly qualification failure mode. An SAP AE
+      referral without direct end-customer budget evidence is NOT qualified. Route to
+      Alliances Owner (not AE) to verify budget with the AE and confirm a direct
+      end-customer meeting before activating. Do not route to AE until budget is
+      confirmed — this avoids the L3 pattern (45 days wasted on AE referral with no
+      real budget). SAP AE enthusiasm is a co-sell routing signal, not a qualification
+      signal. Source: 04_qualification_interview.md §3 routing rules,
+      03_channel_interview.md §2 SAP-field failure mode.
+
+  - condition: "S_SI_PARTNER_INVOLVED AND Q_BUDGET_CONFIRMED is null"
+    rationale: >
+      SI-partner pull-through WITHOUT prime contract confirmation: Big4 MD relationship
+      without a live program is the "partner mirage" failure mode (FM-SAP-03).
+      Route to SI-Partner Lead to confirm prime contract status and SOW slot.
+      Do not activate in pipeline until prime contract signed or final-stage LOI.
+      Investing delivery capacity in unconfirmed SI-partner pursuits is a high-cost
+      failure mode that occurred twice in the last 12 months.
+      Source: 04_qualification_interview.md §3 routing rules,
+      03_channel_interview.md §3 SI-partner failure mode.
+
+  - condition: "Q_AUTHORITY_IDENTIFIED AND Q_NEED_ARTICULATED AND S_S4_MIGRATION_TIMELINE AND Q_BUDGET_CONFIRMED is null"
+    rationale: >
+      Executive sponsor and named use case confirmed, S/4 migration timeline confirmed,
+      but budget not yet confirmed: this account has high intent but the budget process
+      is behind. These accounts often convert within one budget cycle if pursued
+      correctly. Route to AE for direct CFO/CIO budget conversation. Do not move to
+      auto-pass until budget is confirmed — timeline + need without budget is L2 risk
+      profile (manufacturer lost to Accenture because CFO engagement was insufficient).
+      Source: 04_qualification_interview.md §2 (Q_BUDGET_CONFIRMED evidence gate),
+      02_icp_interview.md §3 L2 deal loss.
+
+  - condition: "S_CLEAN_CORE_INITIATIVE AND S_S4_MIGRATION_TIMELINE AND Q_NEED_ARTICULATED is null"
+    rationale: >
+      Clean core initiative + S/4 migration timeline but no named use case: this account
+      is on the right technical trajectory but has not yet identified a specific Joule
+      use case. These are high-value nurture accounts — technically ready within 12 months
+      but not yet a buyer. Route to AE for nurture call: goal is to help the prospect
+      identify a high-ROI Joule use case, not to close immediately. FM-SAP-09 notes
+      that accounts in clean core + RISE migration mode are often missed because they
+      don't yet have a named use case. Proactive nurture converts these in 6-12 months.
+      Source: 05_failure_modes_interview.md FM-SAP-09, FM-SAP-07.

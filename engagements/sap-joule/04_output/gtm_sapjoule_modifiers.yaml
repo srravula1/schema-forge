@@ -1,0 +1,543 @@
+account:
+  employee_range:
+    buckets:
+    - label: micro
+      value: 1-10
+    - label: small
+      value: 11-50
+    - label: growth
+      value: 51-200
+    - label: mid_market
+      value: 201-1000
+    - label: enterprise_lower
+      value: 1001-5000
+    - label: enterprise_upper
+      value: 5000+
+    description: Standard headcount buckets for A_EMPLOYEE_RANGE normalization.
+    source: Salesforce lead-scoring standard (trailhead.salesforce.com); HubSpot company
+      size buckets (knowledge.hubspot.com)
+  funding_stage:
+    description: Funding stage normalization for A_FUNDING_STAGE.
+    source: Crunchbase funding stage taxonomy (crunchbase.com/discover/funding_rounds);
+      PitchBook stage definitions
+    stages:
+    - description: No external institutional funding
+      value: bootstrapped
+    - description: Friends/family or angel round, typically <$1M
+      value: pre_seed
+    - description: Seed round, typically $1M-$4M
+      value: seed
+    - description: Series A, typically $5M-$20M
+      value: series_a
+    - description: Series B, typically $20M-$60M
+      value: series_b
+    - description: Series C, typically $60M-$200M
+      value: series_c
+    - description: Series D or later
+      value: series_d_plus
+    - description: Listed on public exchange (NYSE, NASDAQ, LSE, etc.)
+      value: public
+    - description: Acquired by another entity
+      value: acquired
+  industry:
+    crunchbase_categories:
+      source: Crunchbase categories (crunchbase.com/discover/organization.categories)
+      values:
+      - saas
+      - enterprise_software
+      - developer_tools
+      - devops
+      - data_management
+      - business_intelligence
+      - crm
+      - marketing_automation
+      - sales_tech
+      - hr_tech
+      - legal_tech
+      - proptech
+      - insurtech
+      - climate_tech
+      - supply_chain
+      - logistics
+      - ecommerce
+      - consumer
+      - marketplace
+      - vertical_saas
+    description: Industry/sector modifiers for A_INDUSTRY normalization and ICP filtering.
+    sectors:
+    - code: '11'
+      label: agriculture_forestry_fishing_hunting
+    - code: '21'
+      label: mining_quarrying_oil_gas
+    - code: '22'
+      label: utilities
+    - code: '23'
+      label: construction
+    - code: 31-33
+      label: manufacturing
+      sub:
+      - industrial_machinery
+      - semiconductors_electronics
+      - medical_devices
+      - food_beverage
+    - code: '42'
+      label: wholesale_trade
+    - code: 44-45
+      label: retail_trade
+    - code: 48-49
+      label: transportation_warehousing
+    - code: '51'
+      label: information_technology
+      sub:
+      - software_saas
+      - data_analytics
+      - cybersecurity
+      - cloud_infrastructure
+      - ai_ml
+      - telecommunications
+      - media_publishing
+    - code: '52'
+      label: finance_insurance
+      sub:
+      - banking
+      - insurance
+      - investment_management
+      - fintech
+      - payments
+    - code: '53'
+      label: real_estate
+    - code: '54'
+      label: professional_scientific_technical_services
+      sub:
+      - management_consulting
+      - it_consulting
+      - legal_services
+      - accounting
+      - engineering_services
+      - marketing_advertising
+      - research_development
+    - code: '55'
+      label: management_of_companies_enterprises
+    - code: '56'
+      label: administrative_support_waste_management
+      sub:
+      - staffing_recruiting
+      - business_process_outsourcing
+    - code: '61'
+      label: educational_services
+      sub:
+      - higher_education
+      - edtech
+      - corporate_training
+    - code: '62'
+      label: healthcare_social_assistance
+      sub:
+      - hospitals_health_systems
+      - health_insurance
+      - medical_practice
+      - healthtech
+      - pharma_biotech
+      - mental_health
+    - code: '71'
+      label: arts_entertainment_recreation
+    - code: '72'
+      label: accommodation_food_services
+    - code: '81'
+      label: other_services
+    - code: '92'
+      label: public_administration_government
+    source: NAICS 2022 (census.gov/naics); Crunchbase industry taxonomy (crunchbase.com/categories);
+      LinkedIn industry list (linkedin.com/help/linkedin/answer/6957)
+  revenue_range:
+    buckets:
+    - label: micro
+      value: <1M
+    - label: small
+      value: 1-10M
+    - label: lower_mid_market
+      value: 10-50M
+    - label: mid_market
+      value: 50-250M
+    - label: upper_mid_market
+      value: 250M-1B
+    - label: enterprise
+      value: 1B+
+    description: Annual revenue buckets for A_REVENUE_RANGE normalization.
+    source: Common B2B revenue segmentation (SiriusDecisions/Forrester SMB/ENT taxonomy)
+  tech_stack:
+    categories:
+      bi_analytics:
+      - Tableau
+      - Looker
+      - Power BI
+      - Metabase
+      - Hex
+      cdp:
+      - Segment
+      - RudderStack
+      - mParticle
+      - Hightouch
+      cloud_infra:
+      - AWS
+      - Google Cloud
+      - Azure
+      - Vercel
+      - Heroku
+      collaboration:
+      - Slack
+      - Microsoft Teams
+      - Notion
+      - Confluence
+      - Linear
+      crm:
+      - Salesforce
+      - HubSpot
+      - Pipedrive
+      - Zoho CRM
+      - Microsoft Dynamics 365
+      data_warehouse:
+      - Snowflake
+      - BigQuery
+      - Redshift
+      - Databricks
+      - DuckDB
+      enrichment:
+      - Apollo
+      - ZoomInfo
+      - Clearbit
+      - Clay
+      - People Data Labs
+      marketing_automation:
+      - Marketo
+      - Pardot
+      - ActiveCampaign
+      - Klaviyo
+      - Braze
+      payment:
+      - Stripe
+      - Braintree
+      - Recurly
+      - Chargebee
+      sales_engagement:
+      - Outreach
+      - Salesloft
+      - Apollo
+      - Instantly
+      - Smartlead
+      - Lemlist
+    description: Technology category modifiers for A_TECH_STACK_ITEM normalization.
+    source: BuiltWith technology categories (builtwith.com/lists); TheirStack taxonomy
+      (theirstack.com); G2 software categories (g2.com/categories)
+contact:
+  department:
+    buckets:
+    - includes:
+      - software engineering
+      - data engineering
+      - platform
+      - infrastructure
+      - devops
+      - sre
+      - qa
+      value: engineering
+    - includes:
+      - product management
+      - product design
+      - ux
+      - design
+      value: product
+    - includes:
+      - account executive
+      - sdr
+      - bdr
+      - sales development
+      - field sales
+      - inside sales
+      - channel sales
+      value: sales
+    - includes:
+      - demand generation
+      - content marketing
+      - growth
+      - brand
+      - events
+      - product marketing
+      - digital marketing
+      value: marketing
+    - includes:
+      - revenue operations
+      - sales operations
+      - marketing operations
+      - go-to-market operations
+      - crm administration
+      value: revops
+    - includes:
+      - customer success
+      - account management
+      - customer support
+      - onboarding
+      - implementation
+      value: cs
+    - includes:
+      - finance
+      - accounting
+      - fp&a
+      - treasury
+      - procurement
+      value: finance
+    - includes:
+      - human resources
+      - people operations
+      - recruiting
+      - talent acquisition
+      - learning and development
+      value: hr
+    - includes:
+      - legal
+      - compliance
+      - privacy
+      - contracts
+      value: legal
+    - includes:
+      - operations
+      - business operations
+      - strategy
+      - chief of staff
+      value: operations
+    - includes:
+      - executive
+      - board
+      - investor relations
+      - communications
+      value: other
+    description: Department bucket normalization for C_DEPARTMENT.
+    source: LinkedIn job function taxonomy (linkedin.com/help/linkedin/answer/109219);
+      HubSpot contact property department values
+  seniority:
+    description: Seniority tier normalization for C_SENIORITY.
+    source: LinkedIn Sales Navigator seniority filters (linkedin.com/sales/search);
+      ZoomInfo job-function taxonomy (developer.zoominfo.com)
+    tiers:
+    - description: Individual contributor — no direct reports
+      example_titles:
+      - Account Executive
+      - Software Engineer
+      - Data Analyst
+      - SDR
+      - BDR
+      - Marketing Analyst
+      value: ic
+    - description: Manages a team, typically 2-10 reports
+      example_titles:
+      - Sales Manager
+      - Engineering Manager
+      - Marketing Manager
+      - Revenue Operations Manager
+      value: manager
+    - description: Manages managers or a department
+      example_titles:
+      - Director of Sales
+      - Director of Engineering
+      - Director of Marketing
+      - Director of Revenue Operations
+      value: director
+    - description: VP or SVP level
+      example_titles:
+      - VP of Sales
+      - VP of Engineering
+      - SVP of Marketing
+      - VP of Revenue
+      - VP of Customer Success
+      value: vp
+    - description: C-level executive
+      example_titles:
+      - CEO
+      - CTO
+      - CFO
+      - COO
+      - CMO
+      - CRO
+      - CPO
+      - CISO
+      value: c_suite
+    - description: Founder or co-founder (may overlap with c_suite)
+      example_titles:
+      - Founder
+      - Co-Founder
+      - Founding Engineer
+      - Founding AE
+      value: founder
+qualification:
+  confidence_thresholds:
+    auto_disqualify_below: 0.5
+    auto_qualify_above: 0.85
+    description: Confidence thresholds for HIL routing. Override during benchmark
+      call.
+    hil_between:
+    - 0.5
+    - 0.85
+    source: Platt calibration methodology; internal schema-forge default
+  disposition_policy:
+    description: Evidence-to-disposition mapping. See policy.py for the code implementation.
+    disposition_values:
+    - qualified
+    - nurture
+    - disqualified
+    evidence_labels:
+    - Q_BUDGET_CONFIRMED
+    - Q_AUTHORITY_IDENTIFIED
+    - Q_NEED_ARTICULATED
+    - Q_TIMELINE_STATED
+    framework: MEDDPICC
+    source: MEDDPICC qualification framework (public; multiple structured versions
+      on github.com and notion.so); Clari published qualification rubrics (clari.com/blog)
+signal:
+  competitor_mentions:
+    common_competitive_segments:
+    - CRM competitors
+    - sales engagement competitors
+    - enrichment data competitors
+    - BI/analytics competitors
+    - marketing automation competitors
+    description: Competitor name modifiers for S_COMPETITOR_MENTION normalization.
+    note: Buyer-specific competitor list populated during benchmark call.
+    source: G2 competitive categories (g2.com/compare); Gartner Magic Quadrant public
+      reports; Forrester Wave reports
+  funding_triggers:
+    description: Funding event modifiers for S_FUNDING_TRIGGER.
+    high_intent_events:
+    - raised Series A
+    - raised Series B
+    - raised Series C
+    - raised growth equity
+    - raised venture debt
+    - completed IPO
+    - SPAC merger closed
+    - acquired by strategic
+    source: Crunchbase funding announcements (crunchbase.com); PitchBook event taxonomy;
+      PredictLeads funding signals
+    timing_indicators:
+    - within last 30 days
+    - within last 90 days
+    - within last 6 months
+  hiring_signals:
+    description: Hiring pattern modifiers for S_HIRING_TRIGGER. Roles that signal
+      buying intent.
+    high_intent_roles:
+      data_and_ai:
+      - Head of Data
+      - VP of Data
+      - Chief Data Officer
+      - Data Engineer
+      - ML Engineer
+      - AI Engineer
+      - Analytics Engineer
+      engineering_leadership:
+      - VP of Engineering
+      - CTO
+      - Head of Platform
+      - Staff Engineer
+      marketing:
+      - VP of Marketing
+      - Head of Demand Generation
+      - Growth Lead
+      - Marketing Operations Manager
+      sales_and_revenue:
+      - Chief Revenue Officer
+      - VP of Sales
+      - Head of Sales Development
+      - Revenue Operations Manager
+      - Sales Enablement Manager
+      - Enterprise Account Executive
+    source: LinkedIn job postings taxonomy; PredictLeads trigger event taxonomy (predictleads.com/signals)
+  intent_topics:
+    deprioritized:
+    - SAP certification
+    - SAP licensing negotiation
+    - SAP price optimization
+    - SAP reselling
+    - SAP training courses
+    - generic ERP selection
+    - non-SAP ERP evaluation
+    description: Topic modifiers for S_INTENT_TOPIC normalization. ~40 high-signal
+      B2B topics.
+    source: Bombora B2B intent topic taxonomy (bombora.com/products/company-surge-data);
+      6sense intent stage framework (6sense.com/platform/intent-data); G2 buyer intent
+      topics (g2.com/buyer-intent)
+    topics:
+      client_specific:
+      - AI in ERP
+      - AI in SAP
+      - BTP GenAI Hub
+      - ECC to S/4HANA migration
+      - FI period-close automation
+      - GROW with SAP
+      - MM invoice matching AI
+      - RISE with SAP
+      - S/4HANA migration
+      - SAP AI implementation
+      - SAP BTP AI Core
+      - SAP Business Technology Platform
+      - SAP ECC sunset 2027
+      - SAP Joule
+      - SAP Joule implementation
+      - SAP embedded analytics AI
+      - SAP generative AI
+      - SAP intelligent automation
+      - SAP maintenance end date
+      - SAP modernization
+      - SD order exception management
+      - clean core SAP
+      customer_experience:
+      - customer success platform
+      - help desk software
+      - conversational ai
+      - chatbot solutions
+      - voice of customer
+      data_and_analytics:
+      - data warehouse migration
+      - business intelligence tools
+      - data pipeline automation
+      - real-time analytics
+      - customer data platform
+      - data observability
+      - data governance
+      - etl tools
+      - ai ml infrastructure
+      finance_and_procurement:
+      - financial planning and analysis
+      - spend management
+      - procurement automation
+      - contract lifecycle management
+      - accounts payable automation
+      hr_and_workforce:
+      - applicant tracking system
+      - workforce management
+      - employee engagement platform
+      - payroll software
+      - compensation management
+      it_and_infrastructure:
+      - cloud migration
+      - cybersecurity solutions
+      - identity and access management
+      - endpoint security
+      - zero trust security
+      - siem solutions
+      - devops tools
+      - platform engineering
+      - developer productivity
+      sales_and_marketing:
+      - ai sales tooling
+      - sales engagement platform
+      - sales intelligence
+      - crm implementation
+      - crm migration
+      - revenue operations software
+      - marketing automation
+      - account based marketing
+      - demand generation
+      - outbound sales automation
+      - lead enrichment
+      - lead scoring
+      - intent data providers
+      - sales forecasting tools
