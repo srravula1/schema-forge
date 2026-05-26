@@ -1,0 +1,71 @@
+# policy_overrides.yaml — REVIEWED (post-extract-overrides human review, 2026-05-25)
+# Source interviews: 04_qualification_interview.md §§2-4 (evidence gates, deal-breaker)
+#                   02_icp_interview.md §3 (regrets), 05_failure_modes_interview.md §3-4
+# Reviewed and edited by FDE: conditions verified against GtmLabel enum values.
+#
+# Label references use GtmLabel enum member names (e.g., Q_BUDGET_CONFIRMED).
+# All conditions are human-readable expressions; the merge engine writes them as comments.
+
+disqualification_rules:
+  - condition: "A_EMPLOYEE_RANGE in ['1-10']"
+    rationale: >
+      Under 10 employees: insufficient internal infrastructure to absorb a $50k+ engagement.
+      These companies lack a dedicated engineering owner, have immature data practices, and
+      cannot allocate 20% of a technical lead's time to an engagement. Confirmed by regret R-1
+      (seed-stage, 12 employees — data unready) and multiple explicit disqualifications
+      in the ICP interview. The '1-10' bucket maps to companies under ~10 people.
+
+  - condition: "A_FUNDING_STAGE in ['pre_seed', 'seed']"
+    rationale: >
+      Pre-seed and seed companies routinely fail the three project readiness gates:
+      data readiness (no clean corpus), owner readiness (no named technical owner),
+      infrastructure readiness (no production cloud deployment). Budget also typically
+      insufficient for $50k+ sprint engagements. Confirmed by regret R-1 and ICP
+      interview analysis. Note: bootstrapped companies are NOT disqualified — only
+      VC-backed pre-revenue stages.
+
+  - condition: "Q_NEED_ARTICULATED is null AND Q_TIMELINE_STATED is null"
+    rationale: >
+      'AI tire-kicker / fake yes' pattern: no articulated need + no stated timeline =
+      exploratory intent, not a real project. Confirmed by failure modes interview §3
+      and ICP interview §5 (outsider question): "The word 'explore' is a red flag. Real
+      buyers say 'we have X problem and we need to solve it by Y date.'" Both signals
+      absent together is a reliable disqualification trigger.
+
+auto_pass_rules:
+  - condition: "Q_BUDGET_CONFIRMED AND Q_AUTHORITY_IDENTIFIED AND Q_NEED_ARTICULATED AND confidence > 0.75"
+    rationale: >
+      Three MEDDIC evidence gates confirmed (budget, authority, need) at high confidence.
+      Won-deal analysis: all 5 closed-won deals had all three confirmed by end of discovery.
+      When all three are present with confidence > 0.75, this combination predicts >80% close
+      rate in the deal history reviewed. Route to AE for proposal scoping. The fourth gate
+      (Q_TIMELINE_STATED) is still required before contract — this rule gates the discovery-to-
+      proposal transition, not discovery-to-contract.
+
+hil_rules:
+  - condition: "linkedin_engagement_signal AND Q_NEED_ARTICULATED AND confidence > 0.5"
+    rationale: >
+      LinkedIn-inbound with articulated need: this is the boundary between AI tire-kicker
+      and real buyer, and automated routing gets it wrong too often. Human review required
+      to assess whether the articulated need is specific (business-contextualized problem)
+      or vague (exploratory). Channel interview §2: "a vendor name, a specific failure mode,
+      and a business context in the first message is almost always a buyer" — that specificity
+      check requires human judgment. Route to founder or senior AE for 5-minute assessment.
+      Note: 'linkedin_engagement_signal' refers to the custom signal
+      S_LINKEDIN_THOUGHT_LEADERSHIP_ENGAGEMENT defined in channel_overrides.yaml.
+
+  - condition: "Q_BUDGET_CONFIRMED AND Q_AUTHORITY_IDENTIFIED AND Q_TIMELINE_STATED is null"
+    rationale: >
+      Budget and authority confirmed but no timeline = possible project not yet real.
+      This combination appeared in 2 of 5 lost deals (L-4: budget cycle miss, L-2: CTO
+      departure caused timing issue). Without a stated timeline, we cannot confirm that
+      the project exists within the current budget cycle. HIL to probe: "Is this project
+      specifically budgeted for Q[current], and who internally owns the timeline?"
+
+  - condition: "A_EMPLOYEE_RANGE in ['51-200'] AND A_FUNDING_STAGE in ['series_b', 'series_c', 'series_d_plus']"
+    rationale: >
+      Series B/C+ companies in the employee sweet spot: these are high-value but may have
+      procurement friction (see Deal L-1, 300-employee Series C that went to a larger firm
+      on credibility). HIL to assess: is there a procurement process? Does our team size
+      create delivery risk perception? These prospects need a different close motion
+      (more references, possibly a subcontractor structure).
