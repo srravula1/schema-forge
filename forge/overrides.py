@@ -45,6 +45,9 @@ from forge.domains.gtm.baseline.gtm_schema import GtmLabel
 # ---------------------------------------------------------------------------
 
 _VALID_LABEL_VALUES: frozenset[str] = frozenset(lbl.value for lbl in GtmLabel)
+# Also accept enum member names (e.g. "A_EMPLOYEE_RANGE") as valid ICP override keys.
+# The merge engine (forge/merge/__init__.py) resolves both forms via _LABEL_VALUE_BY_KEY.
+_VALID_LABEL_KEYS: frozenset[str] = _VALID_LABEL_VALUES | frozenset(lbl.name for lbl in GtmLabel)
 
 
 def _validate_label(value: str) -> str:
@@ -212,14 +215,17 @@ def load_overrides(overrides_dir: Path) -> OverrideBundle:
 def check_label_refs(bundle: OverrideBundle) -> list[str]:
     """Return a list of error strings for any label reference that is not a real GtmLabel.
 
+    Accepts both label values (e.g. ``"account.employee_range"``) and enum member
+    names (e.g. ``"A_EMPLOYEE_RANGE"``), matching the merge engine's behaviour.
+
     An empty list means all references are valid.
     """
     errors: list[str] = []
 
-    for label_val in bundle.icp.filters:
-        if label_val not in _VALID_LABEL_VALUES:
+    for label_key in bundle.icp.filters:
+        if label_key not in _VALID_LABEL_KEYS:
             errors.append(
-                f"icp_overrides: {label_val!r} is not a valid GtmLabel"
+                f"icp_overrides: {label_key!r} is not a valid GtmLabel"
             )
 
     for label_val in bundle.channel.signal_weights:

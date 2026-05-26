@@ -1,4 +1,4 @@
-"""CLI skeleton: all four subcommands parse; stubs exit non-zero until their epic lands."""
+"""CLI tests: all four subcommands parse and behave correctly."""
 
 import pytest
 
@@ -20,15 +20,9 @@ def test_help_exits_zero():
     assert exc.value.code == 0
 
 
-@pytest.mark.parametrize(
-    "argv",
-    [
-        # validate remains a stub — nonzero exit expected.
-        ["validate", "--engagement", "/tmp/x"],
-    ],
-)
-def test_stub_commands_exit_nonzero(argv):
-    assert main(argv) != 0
+def test_validate_nonexistent_engagement_exits_nonzero():
+    # validate is implemented (EPIC F); nonexistent engagement dir → nonzero.
+    assert main(["validate", "--engagement", "/tmp/__schema_forge_no_such_dir__"]) != 0
 
 
 def test_generate_nonexistent_engagement_exits_nonzero():
