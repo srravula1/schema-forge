@@ -217,7 +217,26 @@ def cmd_generate(
 
 
 def cmd_validate(args: argparse.Namespace) -> int:
-    return _stub("validate", "EPIC F")
+    from forge.validate import run_validate
+
+    engagement = args.engagement.resolve()
+
+    if not engagement.is_dir():
+        print(
+            f"validate: engagement directory not found: {engagement}",
+            file=sys.stderr,
+        )
+        return 1
+
+    result = run_validate(engagement)
+
+    if result.ok:
+        print("validate: all checks passed.", file=sys.stderr)
+        return 0
+    else:
+        print("validate: one or more checks FAILED:", file=sys.stderr)
+        print(result.report(), file=sys.stderr)
+        return 1
 
 
 def build_parser() -> argparse.ArgumentParser:
