@@ -23,8 +23,8 @@ def test_help_exits_zero():
 @pytest.mark.parametrize(
     "argv",
     [
-        # init and generate/validate are still stubs — nonzero exit expected.
-        ["init", "--domain", "gtm", "--client", "acme", "--output", "/tmp/x"],
+        # init (EPIC C1) and extract-overrides (EPIC D) are implemented;
+        # generate and validate remain stubs — nonzero exit expected.
         ["generate", "--engagement", "/tmp/x"],
         ["validate", "--engagement", "/tmp/x"],
     ],

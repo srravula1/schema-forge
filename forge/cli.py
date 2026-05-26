@@ -21,6 +21,8 @@ from typing import Any
 
 import yaml
 
+from forge.scaffold import init_engagement
+
 _NOT_IMPLEMENTED = 2
 
 # Header written at the top of every proposed override file (Story D3).
@@ -52,7 +54,16 @@ def _stub(command: str, epic: str) -> int:
 
 
 def cmd_init(args: argparse.Namespace) -> int:
-    return _stub("init", "EPIC C")
+    try:
+        init_engagement(args.domain, args.client, args.output)
+        print(f"Engagement initialized: {args.output}", file=sys.stderr)
+        return 0
+    except ValueError as exc:
+        print(f"schema-forge init: {exc}", file=sys.stderr)
+        return 1
+    except FileExistsError as exc:
+        print(f"schema-forge init: {exc}", file=sys.stderr)
+        return 1
 
 
 def cmd_extract_overrides(
