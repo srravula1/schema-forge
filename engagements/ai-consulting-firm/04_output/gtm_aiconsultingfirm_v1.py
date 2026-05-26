@@ -14,47 +14,39 @@ from pydantic import BaseModel, ConfigDict, Field
 
 
 class GtmLabel(str, Enum):
-    """GTM label union. Base labels + client-specific custom signals."""
+    """GTM label union. Base labels (from the gtm baseline) + client-specific custom signals."""
 
-    # --- Account family ---
-    A_COMPANY_NAME = "account.company_name"
-    A_DOMAIN = "account.domain"
-    A_INDUSTRY = "account.industry"
-    A_EMPLOYEE_RANGE = "account.employee_range"
-    A_REVENUE_RANGE = "account.revenue_range"
-    A_HQ_LOCATION = "account.hq_location"
-    A_TECH_STACK_ITEM = "account.tech_stack_item"
-    A_FUNDING_STAGE = "account.funding_stage"
-
-    # --- Contact family ---
-    C_FULL_NAME = "contact.full_name"
-    C_TITLE = "contact.title"
-    C_SENIORITY = "contact.seniority"
-    C_DEPARTMENT = "contact.department"
-    C_EMAIL = "contact.email"
-    C_LINKEDIN_URL = "contact.linkedin_url"
-
-    # --- Signal family ---
-    S_HIRING_TRIGGER = "signal.hiring_trigger"
-    S_FUNDING_TRIGGER = "signal.funding_trigger"
-    S_TECH_ADOPTION = "signal.tech_adoption"
-    S_PAIN_POINT_MENTION = "signal.pain_point_mention"
-    S_COMPETITOR_MENTION = "signal.competitor_mention"
-    S_INTENT_TOPIC = "signal.intent_topic"
-
-    # --- Engagement family ---
-    E_EMAIL_OPEN = "engagement.email_open"
-    E_EMAIL_REPLY = "engagement.email_reply"
-    E_MEETING_BOOKED = "engagement.meeting_booked"
-    E_CALL_TRANSCRIPT_REF = "engagement.call_transcript_ref"
-    E_FORM_SUBMIT = "engagement.form_submit"
-
-    # --- Qualification family ---
-    Q_BUDGET_CONFIRMED = "qualification.budget_confirmed"
-    Q_AUTHORITY_IDENTIFIED = "qualification.authority_identified"
-    Q_NEED_ARTICULATED = "qualification.need_articulated"
-    Q_TIMELINE_STATED = "qualification.timeline_stated"
-    Q_DISPOSITION = "qualification.disposition"
+    A_COMPANY_NAME = 'account.company_name'
+    A_DOMAIN = 'account.domain'
+    A_INDUSTRY = 'account.industry'
+    A_EMPLOYEE_RANGE = 'account.employee_range'
+    A_REVENUE_RANGE = 'account.revenue_range'
+    A_HQ_LOCATION = 'account.hq_location'
+    A_TECH_STACK_ITEM = 'account.tech_stack_item'
+    A_FUNDING_STAGE = 'account.funding_stage'
+    C_FULL_NAME = 'contact.full_name'
+    C_TITLE = 'contact.title'
+    C_SENIORITY = 'contact.seniority'
+    C_DEPARTMENT = 'contact.department'
+    C_EMAIL = 'contact.email'
+    C_LINKEDIN_URL = 'contact.linkedin_url'
+    C_AFFILIATION = 'contact.affiliation'
+    S_HIRING_TRIGGER = 'signal.hiring_trigger'
+    S_FUNDING_TRIGGER = 'signal.funding_trigger'
+    S_TECH_ADOPTION = 'signal.tech_adoption'
+    S_PAIN_POINT_MENTION = 'signal.pain_point_mention'
+    S_COMPETITOR_MENTION = 'signal.competitor_mention'
+    S_INTENT_TOPIC = 'signal.intent_topic'
+    E_EMAIL_OPEN = 'engagement.email_open'
+    E_EMAIL_REPLY = 'engagement.email_reply'
+    E_MEETING_BOOKED = 'engagement.meeting_booked'
+    E_CALL_TRANSCRIPT_REF = 'engagement.call_transcript_ref'
+    E_FORM_SUBMIT = 'engagement.form_submit'
+    Q_BUDGET_CONFIRMED = 'qualification.budget_confirmed'
+    Q_AUTHORITY_IDENTIFIED = 'qualification.authority_identified'
+    Q_NEED_ARTICULATED = 'qualification.need_articulated'
+    Q_TIMELINE_STATED = 'qualification.timeline_stated'
+    Q_DISPOSITION = 'qualification.disposition'
 
     # --- Custom signals (from channel_overrides) ---
     S_LINKEDIN_THOUGHT_LEADERSHIP_ENGAGEMENT = 'custom.s_linkedin_thought_leadership_engagement'
@@ -80,57 +72,37 @@ class GtmEntityLink(BaseModel):
 def extraction_guidance() -> dict[str, str]:
     """Return {label_value: human_definition} for every label including custom signals."""
     _guidance: dict[str, str] = {
-        "account.company_name": "The legal or commonly-used name of a company being discussed.",
-        "account.domain": "The primary web domain of a company (e.g. \'acme.com\').",
-        "account.industry": "The industry the company operates in. Use the most specific form stated.",
-        "account.employee_range": (
-            "Employee count as a bucket. Use one of: \'1-10\', \'11-50\', \'51-200\', "
-            "\'201-1000\', \'1001-5000\', \'5000+\'. Map exact counts to the right bucket."
-        ),
-        "account.revenue_range": (
-            "Annual revenue bucket. Use one of: \'<1M\', \'1-10M\', \'10-50M\', "
-            "\'50-250M\', \'250M-1B\', \'1B+\'."
-        ),
-        "account.hq_location": "Headquarters city/region/country, as stated.",
-        "account.tech_stack_item": (
-            "A specific technology, tool, or vendor the company uses. Extract one entity per technology."
-        ),
-        "account.funding_stage": (
-            "Funding stage. Use one of: \'bootstrapped\', \'pre_seed\', \'seed\', \'series_a\', "
-            "\'series_b\', \'series_c\', \'series_d_plus\', \'public\', \'acquired\'."
-        ),
-        "contact.full_name": "A person\'s full name when referenced as a professional contact.",
-        "contact.title": "The exact job title as stated.",
-        "contact.seniority": (
-            "Seniority bucket. Use one of: \'ic\', \'manager\', \'director\', \'vp\', \'c_suite\', \'founder\'."
-        ),
-        "contact.department": (
-            "Department bucket. Use one of: \'engineering\', \'product\', \'sales\', \'marketing\', "
-            "\'revops\', \'cs\', \'finance\', \'hr\', \'legal\', \'operations\', \'other\'."
-        ),
-        "contact.email": "A professional email address for the contact.",
-        "contact.linkedin_url": "A LinkedIn profile URL for the contact.",
-        "signal.hiring_trigger": (
-            "A mention that the company is hiring for a specific role or team in a way "
-            "that signals buying intent."
-        ),
-        "signal.funding_trigger": "A funding event with timing or amount.",
-        "signal.tech_adoption": "A statement that the company has adopted or deployed a specific technology recently.",
-        "signal.pain_point_mention": "A stated problem, frustration, or gap. Extract the pain phrase as-stated.",
-        "signal.competitor_mention": "A named competitor product or vendor.",
-        "signal.intent_topic": "A topic the account is actively researching.",
-        "engagement.email_open": "A recorded email open event.",
-        "engagement.email_reply": "A recorded email reply event.",
-        "engagement.meeting_booked": "A booked or scheduled meeting reference.",
-        "engagement.call_transcript_ref": "A reference to or excerpt from a sales call transcript.",
-        "engagement.form_submit": "A form submission (demo request, content download, etc.).",
-        "qualification.budget_confirmed": "Explicit evidence that budget exists or has been allocated. Quote the evidence.",
-        "qualification.authority_identified": "Explicit evidence that the decision-maker has been identified. Quote the evidence.",
-        "qualification.need_articulated": "Explicit evidence that a need or use case has been articulated. Quote the evidence.",
-        "qualification.timeline_stated": "Explicit evidence of a buying timeline or compelling event. Quote the evidence.",
-        "qualification.disposition": (
-            "The overall qualification verdict. Use one of: \'qualified\', \'nurture\', \'disqualified\'."
-        ),
+        'account.company_name': 'The legal or commonly-used name of a company being discussed.',
+        'account.domain': "The primary web domain of a company (e.g. 'acme.com').",
+        'account.industry': 'The industry the company operates in. Use the most specific form stated.',
+        'account.employee_range': "Employee count as a bucket. Use one of: '1-10', '11-50', '51-200', '201-1000', '1001-5000', '5000+'. Map exact counts to the right bucket.",
+        'account.revenue_range': "Annual revenue bucket. Use one of: '<1M', '1-10M', '10-50M', '50-250M', '250M-1B', '1B+'.",
+        'account.hq_location': 'Headquarters city/region/country, as stated.',
+        'account.tech_stack_item': "A specific technology, tool, or vendor the company uses (e.g. 'Salesforce', 'Snowflake', 'React'). Extract one entity per technology mentioned.",
+        'account.funding_stage': "Funding stage. Use one of: 'bootstrapped', 'pre_seed', 'seed', 'series_a', 'series_b', 'series_c', 'series_d_plus', 'public', 'acquired'.",
+        'contact.full_name': "A person's full name when referenced as a professional contact.",
+        'contact.title': "The exact job title as stated (e.g. 'Director of Revenue Operations').",
+        'contact.seniority': "Seniority bucket. Use one of: 'ic', 'manager', 'director', 'vp', 'c_suite', 'founder'.",
+        'contact.department': "Department bucket. Use one of: 'engineering', 'product', 'sales', 'marketing', 'revops', 'cs', 'finance', 'hr', 'legal', 'operations', 'other'.",
+        'contact.email': 'A professional email address for the contact.',
+        'contact.linkedin_url': 'A LinkedIn profile URL for the contact.',
+        'contact.affiliation': "The organization the contact belongs to relative to the deal. Use one of: 'end_customer' (works at the prospect/buying company), 'channel_partner' (a referral/co-sell partner, reseller, or systems integrator), 'vendor' (works for a solution vendor), 'internal' (your own company), 'unknown'. Engagement-specific partner sub-types (e.g. SAP field vs SI) stay in overrides.",
+        'signal.hiring_trigger': "A mention that the company is hiring for a specific role or team in a way that signals buying intent (e.g. 'hiring a Head of Data', 'expanding the SDR team').",
+        'signal.funding_trigger': "A funding event with timing or amount (e.g. 'raised $20M Series B in March').",
+        'signal.tech_adoption': "A statement that the company has adopted, migrated to, or deployed a specific technology recently (not just 'uses').",
+        'signal.pain_point_mention': "A stated problem, frustration, or gap (e.g. 'our pipeline reporting is broken', 'we can't scale onboarding'). Extract the pain phrase as-stated.",
+        'signal.competitor_mention': 'A named competitor product or vendor.',
+        'signal.intent_topic': "A topic the account is actively researching (e.g. 'data warehouse migration', 'AI sales tooling'). Use Bombora-style topic naming when possible.",
+        'engagement.email_open': 'A recorded email open event.',
+        'engagement.email_reply': 'A recorded email reply event, including the reply text if available.',
+        'engagement.meeting_booked': 'A booked or scheduled meeting reference.',
+        'engagement.call_transcript_ref': 'A reference to or excerpt from a sales call transcript.',
+        'engagement.form_submit': 'A form submission (demo request, content download, etc.).',
+        'qualification.budget_confirmed': 'Explicit evidence that budget exists or has been allocated. Quote the evidence.',
+        'qualification.authority_identified': 'Explicit evidence that the decision-maker has been identified. Quote the evidence.',
+        'qualification.need_articulated': 'Explicit evidence that a need or use case has been articulated. Quote the evidence.',
+        'qualification.timeline_stated': 'Explicit evidence of a buying timeline or compelling event. Quote the evidence.',
+        'qualification.disposition': "The overall qualification verdict for the account/opportunity. Use one of: 'qualified', 'nurture', 'disqualified'.",
         # Custom signals
         'custom.s_linkedin_thought_leadership_engagement': "Prospect has engaged with founder LinkedIn content on AI/LLM topics in the last 14 days, with engagement that contains specific technical or business context (not generic 'great post' comments). Qualifying engagement includes: comments describing a specific problem the prospect is facing, DMs with a business-specific AI question, or reshares with context that reveals organizational relevance. Does NOT qualify: generic likes, 'great insights' comments, single engagement events without follow-on activity.\n",
     }
@@ -144,19 +116,19 @@ def extraction_guidance() -> dict[str, str]:
 
 def valid_links() -> list[GtmEntityLink]:
     return [
-        GtmEntityLink(from_label=GtmLabel.C_FULL_NAME, to_label=GtmLabel.A_COMPANY_NAME, relation="works_at"),
-        GtmEntityLink(from_label=GtmLabel.C_TITLE, to_label=GtmLabel.C_FULL_NAME, relation="title_of"),
-        GtmEntityLink(from_label=GtmLabel.S_HIRING_TRIGGER, to_label=GtmLabel.A_COMPANY_NAME, relation="concerns"),
-        GtmEntityLink(from_label=GtmLabel.S_FUNDING_TRIGGER, to_label=GtmLabel.A_COMPANY_NAME, relation="concerns"),
-        GtmEntityLink(from_label=GtmLabel.S_TECH_ADOPTION, to_label=GtmLabel.A_COMPANY_NAME, relation="concerns"),
-        GtmEntityLink(from_label=GtmLabel.S_PAIN_POINT_MENTION, to_label=GtmLabel.A_COMPANY_NAME, relation="concerns"),
-        GtmEntityLink(from_label=GtmLabel.E_EMAIL_REPLY, to_label=GtmLabel.C_FULL_NAME, relation="from_contact"),
-        GtmEntityLink(from_label=GtmLabel.E_MEETING_BOOKED, to_label=GtmLabel.C_FULL_NAME, relation="with_contact"),
-        GtmEntityLink(from_label=GtmLabel.Q_BUDGET_CONFIRMED, to_label=GtmLabel.A_COMPANY_NAME, relation="concerns"),
-        GtmEntityLink(from_label=GtmLabel.Q_AUTHORITY_IDENTIFIED, to_label=GtmLabel.A_COMPANY_NAME, relation="concerns"),
-        GtmEntityLink(from_label=GtmLabel.Q_NEED_ARTICULATED, to_label=GtmLabel.A_COMPANY_NAME, relation="concerns"),
-        GtmEntityLink(from_label=GtmLabel.Q_TIMELINE_STATED, to_label=GtmLabel.A_COMPANY_NAME, relation="concerns"),
-        GtmEntityLink(from_label=GtmLabel.Q_DISPOSITION, to_label=GtmLabel.A_COMPANY_NAME, relation="concerns"),
+        GtmEntityLink(from_label=GtmLabel.C_FULL_NAME, to_label=GtmLabel.A_COMPANY_NAME, relation='works_at'),
+        GtmEntityLink(from_label=GtmLabel.C_TITLE, to_label=GtmLabel.C_FULL_NAME, relation='title_of'),
+        GtmEntityLink(from_label=GtmLabel.S_HIRING_TRIGGER, to_label=GtmLabel.A_COMPANY_NAME, relation='concerns'),
+        GtmEntityLink(from_label=GtmLabel.S_FUNDING_TRIGGER, to_label=GtmLabel.A_COMPANY_NAME, relation='concerns'),
+        GtmEntityLink(from_label=GtmLabel.S_TECH_ADOPTION, to_label=GtmLabel.A_COMPANY_NAME, relation='concerns'),
+        GtmEntityLink(from_label=GtmLabel.S_PAIN_POINT_MENTION, to_label=GtmLabel.A_COMPANY_NAME, relation='concerns'),
+        GtmEntityLink(from_label=GtmLabel.E_EMAIL_REPLY, to_label=GtmLabel.C_FULL_NAME, relation='from_contact'),
+        GtmEntityLink(from_label=GtmLabel.E_MEETING_BOOKED, to_label=GtmLabel.C_FULL_NAME, relation='with_contact'),
+        GtmEntityLink(from_label=GtmLabel.Q_BUDGET_CONFIRMED, to_label=GtmLabel.A_COMPANY_NAME, relation='concerns'),
+        GtmEntityLink(from_label=GtmLabel.Q_AUTHORITY_IDENTIFIED, to_label=GtmLabel.A_COMPANY_NAME, relation='concerns'),
+        GtmEntityLink(from_label=GtmLabel.Q_NEED_ARTICULATED, to_label=GtmLabel.A_COMPANY_NAME, relation='concerns'),
+        GtmEntityLink(from_label=GtmLabel.Q_TIMELINE_STATED, to_label=GtmLabel.A_COMPANY_NAME, relation='concerns'),
+        GtmEntityLink(from_label=GtmLabel.Q_DISPOSITION, to_label=GtmLabel.A_COMPANY_NAME, relation='concerns'),
     ]
 
 

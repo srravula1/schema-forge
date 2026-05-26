@@ -1,6 +1,10 @@
 """
-gtm@v1 — vertical schema for GTM artifact extraction. Frozen at 30 labels.
-A v2 emerges from a buyer call that surfaces buyer-specific label needs.
+gtm@v2 — vertical schema for GTM artifact extraction. 31 labels.
+
+v1 (frozen at 30 labels) is preserved in git history. v2 adds exactly one generic
+label, C_AFFILIATION, after two engagements (ai-consulting-firm, sap-joule) both needed
+to express which org a contact belongs to relative to the deal. Engagement-specific
+partner sub-types stay in overrides. See docs/STAGE2_FINDINGS.md.
 
 Source documents: company website, LinkedIn profile/post, sales call transcript,
 CRM note, inbound email, 10-K excerpt. Extracts structured signals from any of these.
@@ -46,6 +50,7 @@ class GtmLabel(str, Enum):
     C_DEPARTMENT = "contact.department"
     C_EMAIL = "contact.email"
     C_LINKEDIN_URL = "contact.linkedin_url"
+    C_AFFILIATION = "contact.affiliation"  # gtm@v2: which org the contact belongs to re: the deal
 
     # --- Signal family (intent / trigger events) ---
     S_HIRING_TRIGGER = "signal.hiring_trigger"
@@ -139,6 +144,13 @@ def extraction_guidance() -> dict[str, str]:
         ),
         GtmLabel.C_EMAIL.value: "A professional email address for the contact.",
         GtmLabel.C_LINKEDIN_URL.value: "A LinkedIn profile URL for the contact.",
+        GtmLabel.C_AFFILIATION.value: (
+            "The organization the contact belongs to relative to the deal. Use one of: "
+            "'end_customer' (works at the prospect/buying company), 'channel_partner' "
+            "(a referral/co-sell partner, reseller, or systems integrator), 'vendor' "
+            "(works for a solution vendor), 'internal' (your own company), 'unknown'. "
+            "Engagement-specific partner sub-types (e.g. SAP field vs SI) stay in overrides."
+        ),
         GtmLabel.S_HIRING_TRIGGER.value: (
             "A mention that the company is hiring for a specific role or team in a way "
             "that signals buying intent (e.g. 'hiring a Head of Data', 'expanding the SDR team')."
