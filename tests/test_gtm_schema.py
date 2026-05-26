@@ -64,8 +64,8 @@ def test_extraction_guidance_covers_every_label():
     assert not extra, f"unknown labels in extraction_guidance: {extra}"
 
 
-def test_extraction_guidance_has_30_labels():
-    assert len(extraction_guidance()) == 30
+def test_extraction_guidance_has_31_labels():
+    assert len(extraction_guidance()) == 31
 
 
 def test_valid_links_reference_real_labels():
@@ -87,11 +87,11 @@ def test_gtm_label_families():
     engagement = [l for l in labels if l.value.startswith("engagement.")]
     qualification = [l for l in labels if l.value.startswith("qualification.")]
     assert len(account) == 8
-    assert len(contact) == 6
+    assert len(contact) == 7  # gtm@v2: + C_AFFILIATION
     assert len(signal) == 6
     assert len(engagement) == 5
     assert len(qualification) == 5
-    assert len(account) + len(contact) + len(signal) + len(engagement) + len(qualification) == 30
+    assert len(account) + len(contact) + len(signal) + len(engagement) + len(qualification) == 31
 
 
 def test_entity_link_extra_forbidden():

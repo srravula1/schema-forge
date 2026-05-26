@@ -43,7 +43,9 @@ Five artifacts produced: schema `.py`, modifiers `.yaml`, policy `.py`,
   every change traces back to an interview answer.
 - Baseline artifacts are citation-backed (Path B): every label, modifier, and
   failure mode cites a public source.
-- `gtm@v1` is frozen at 30 labels; new labels come from buyer calls as `gtm@v2`.
+- `gtm@v2` (31 labels) is the current baseline; it added `C_AFFILIATION` after two engagements
+  needed contact org-affiliation (see `docs/STAGE2_FINDINGS.md`). v1 (30 labels) lives in git history.
+  New generic labels are added only when ≥2 engagements need them; single-engagement needs stay in overrides.
 
 ## Discipline
 The roadmap is staged around **engagements, not features**. Build v0 (Stage 1) only.

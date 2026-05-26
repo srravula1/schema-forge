@@ -1,6 +1,6 @@
-baseline_version: gtm_v1.0
+baseline_version: gtm_v2.0
 client: ai-consulting-firm
-generated_at: '2026-05-26T01:01:37Z'
+generated_at: '2026-05-26T04:47:28Z'
 output:
   changes_from_baseline:
   - "A_EMPLOYEE_RANGE: include ['11-50', '51-200']; exclude ['1-10', '201-1000', '1001-5000',\

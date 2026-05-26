@@ -33,7 +33,7 @@ class TestInitCreatesTree:
         manifest = yaml.safe_load((output / "manifest.yaml").read_text())
         assert manifest["domain"] == "gtm"
         assert manifest["client"] == "acme"
-        assert manifest["baseline_version"] == "gtm_v1.0"
+        assert manifest["baseline_version"] == "gtm_v2.0"
         assert "generated_at" in manifest
 
 

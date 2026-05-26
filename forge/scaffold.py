@@ -148,7 +148,7 @@ def _write_manifest(domain: str, client: str, output: Path) -> None:
     manifest = {
         "domain": domain,
         "client": client,
-        "baseline_version": f"{domain}_v1.0",
+        "baseline_version": f"{domain}_v2.0",
         "generated_at": None,
         "overrides": {},
         "output": {

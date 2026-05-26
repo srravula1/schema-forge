@@ -424,7 +424,7 @@ class TestManifest:
         _run_generate(eng)
 
         data = yaml.safe_load((eng / "manifest.yaml").read_text())
-        assert data["baseline_version"] == "gtm_v1.0"
+        assert data["baseline_version"] == "gtm_v2.0"
 
     def test_manifest_has_override_sha256s(self, tmp_path):
         eng = _make_engagement(tmp_path)

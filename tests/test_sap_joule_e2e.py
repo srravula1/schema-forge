@@ -192,13 +192,13 @@ class TestSchemaGuidanceCoverage:
                 f"Check channel_overrides.yaml custom_signals."
             )
 
-    def test_schema_has_36_labels(self):
-        """30 baseline + 6 custom = 36 labels total."""
+    def test_schema_has_37_labels(self):
+        """31 baseline (gtm@v2) + 6 custom = 37 labels total."""
         schema_path = _find_schema_module()
         mod = _load_module(schema_path, "_sj_e2e_label_count")
         label_values = {lbl.value for lbl in mod.GtmLabel}
-        assert len(label_values) == 36, (
-            f"Expected 36 labels (30 baseline + 6 custom), got {len(label_values)}: "
+        assert len(label_values) == 37, (
+            f"Expected 37 labels (31 baseline + 6 custom), got {len(label_values)}: "
             f"{sorted(label_values)}"
         )
 
