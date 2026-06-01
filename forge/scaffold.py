@@ -11,7 +11,7 @@ from pathlib import Path
 
 import yaml
 
-VALID_DOMAINS = {"gtm"}
+VALID_DOMAINS = {"gtm", "bdc_soi"}
 
 _FORGE_DIR = Path(__file__).parent
 

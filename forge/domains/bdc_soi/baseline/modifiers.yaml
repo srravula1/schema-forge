@@ -1,0 +1,67 @@
+# bdc_soi modifier ontology — the per-BDC heterogeneity layer.
+#
+# Every BDC formats its Schedule of Investments differently; the schema stays fixed and these
+# conventions absorb the variation. Each group is citation-backed (the source filing the convention
+# was observed in). Per-fund overrides (03_overrides/modifier_overrides.yaml) extend these.
+#
+# Sources observed in the CalPERS run (2026-06-01):
+#   ARCC 10-Q acc 0001628280-26-027688 (CIK 1287750), SoI as of 2026-03-31
+#   OBDC 10-Q acc 0001655888-26-000033 (CIK 1655888), SoI as of 2026-03-31
+
+units:
+  source: "ARCC 0001628280-26-027688; OBDC 0001655888-26-000033"
+  note: "The mark (FV/par) is unit-free; face/NAV is not — normalize face to a common unit."
+  by_holder:
+    "Ares Capital Corp (ARCC)":
+      principal_column: "Principal"
+      amount_unit: "USD_millions"
+    "Blue Owl Capital Corp (OBDC)":
+      par_column: "Par"
+      amount_unit: "USD_thousands"
+
+currency:
+  source: "ARCC/OBDC SoIs, 2026-03-31"
+  note: "FX tranches carry par in local currency but cost/FV in USD — FV/par is NOT a valid mark; exclude."
+  usd_markers: ["SOFR", "S+", "S +"]
+  fx_markers: ["E+", "Euribor", "SONIA", "SA+", "EUR term", "GBP term", "€", "£"]
+
+tranche_taxonomy:
+  source: "ARCC/OBDC SoIs, 2026-03-31"
+  comparable: # the cross-holder comparable instrument
+    - "first lien senior secured loan"        # term loan — compare this
+  excluded:
+    - "first lien senior secured revolving loan"   # often unfunded (par '—')
+    - "delayed draw term loan"                     # often unfunded
+    - "second lien senior secured loan"            # different seniority
+    - "senior subordinated loan"
+    - "unsecured notes"
+    - "preferred"
+    - "common"
+    - "warrant"
+    - "membership units"
+    - "lp interest"
+
+period:
+  source: "ARCC/OBDC 10-Q structure, 2026"
+  note: >
+    Each 10-Q embeds the current-period SoI AND the prior fiscal year-end SoI as a comparative.
+    Use the current period only. Verified anchor: OBDC Cambrex first-lien 4.50% 2032 marks 100.00
+    as of 2026-03-31 (vs 99.78 at 2025-12-31).
+  current_period_header: "March 31, 2026"
+  comparative_period_header: "December 31, 2025"
+
+entity_aliases:
+  source: "ARCC/OBDC SoIs, 2026-03-31 — OBDC names the operating co via (dba X); ARCC the borrower entity"
+  note: "Strip footnote markers '(\\d+)' and '(dba ...)' for the resolution key; corroborate with maturity."
+  examples:
+    - arcc: "AI Titan Parent, Inc. (13)"
+      obdc: "AI Titan Parent, Inc. (dba Prometheus Group)(3)(4)(8)(22)"
+      key: "ai titan"
+    - arcc: "GI Ranger Intermediate LLC (13)"
+      obdc: "GI Ranger Intermediate, LLC (dba Rectangle Health)(3)(4)(9)"
+      key: "gi ranger"
+    - arcc: "Severin Acquisition, LLC (13)"
+      obdc: "Severin Acquisition, LLC (dba PowerSchool)(3)(4)(8)"
+      key: "severin"
+  do_not_merge: # distinct issuers that share a leading token — never collapse
+    - ["Bamboo Purchaser, Inc.", "Bamboo US BidCo LLC"]
