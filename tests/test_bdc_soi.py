@@ -77,11 +77,17 @@ def test_fx_detector_targeted():
     assert fx.detect(ok, usd)[0] is False
 
 
-def test_out_of_bounds_passes_real_petvet_mark():
+def test_out_of_bounds_is_upper_bound_only():
     from forge.domains.bdc_soi.baseline.failure_modes import fm_mark_out_of_bounds as ob
-    # PetVet's real stressed-but-valid 86.01 must NOT be flagged as misattribution
-    petvet = PositionMark(holder="ARCC", borrower="PetVet", fair_value_mark=86.01, as_of_date="x")
-    assert ob.detect(petvet, SourceDoc(text="First lien senior secured loan"))[0] is False
+    src = SourceDoc(text="First lien senior secured loan")
+    # PetVet's real 86.01 and deep-distress marks (Pluralsight 5.63, Walker Edison 0.94) must PASS —
+    # a low mark is the signal, not an error
+    for valid in (86.01, 5.63, 0.94, 100.97):
+        assert ob.detect(PositionMark(holder="h", borrower="b", fair_value_mark=valid,
+                                      as_of_date="x"), src)[0] is False
+    # only fair-value-above-par (FX / column misattribution) is flagged
+    assert ob.detect(PositionMark(holder="h", borrower="b", fair_value_mark=149.0,
+                                  as_of_date="x"), src)[0] is True
 
 
 # --- gold corpus ----------------------------------------------------------------------------
